@@ -1,0 +1,44 @@
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${file}",
+      //   "preLaunchTask": "tsc: build",
+      "cwd": "${workspaceFolder}",
+      "outFiles": [
+        //"sourceMap": true
+        "${workspaceFolder}/dist/**/*.js"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "ts-node  file",
+      "runtimeExecutable": "node",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": [
+        "--nolazy",
+        "-r",
+        "ts-node/register/transpile-only" //不检查类型会更快一些
+        // "ts-node/register"
+      ],
+      "args": [
+        "-r",
+        "tsconfig-paths/register", //解析@=>src
+        "${file}"
+      ],
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    }
+  ]
+}
