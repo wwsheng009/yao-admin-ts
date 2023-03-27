@@ -19,11 +19,14 @@ export function Select(
   const name = column.name;
 
   const bind = `${name}`;
-  var relation = model_dsl.relations;
-  for (var i in relation) {
-    if (relation[i].type == "hasOne" && column.name == relation[i]["foreign"]) {
-      var field = Studio("remote.select", i, relation[i]);
-      var component: FieldColumn = {
+  const relation = model_dsl.relations;
+  for (const rel in relation) {
+    if (
+      relation[rel].type == "hasOne" &&
+      column.name == relation[rel]["foreign"]
+    ) {
+      const field = Studio("remote.select", rel, relation[rel]);
+      let component: FieldColumn = {
         is_select: true,
         // bind: i + "." + field,
         bind,
@@ -34,11 +37,10 @@ export function Select(
             xProps: {
               $remote: {
                 process: "yao.component.SelectOptions",
-
                 //"scripts." + relation[i].model + "." + i + ".GetSelect",
                 // process: "models." + relation[i]["model"] + ".Get",
                 query: {
-                  model: Studio("file.DotName", relation[i].model),
+                  model: Studio("file.DotName", relation[rel].model),
                   label: field,
                   value: "id",
                 },
@@ -47,7 +49,7 @@ export function Select(
           },
         },
       };
-      component = Withs(component, i);
+      component = Withs(component, rel);
       return component;
     }
   }
@@ -64,12 +66,15 @@ export function EditSelect(
   const name = column.name;
   // console.log("column name:", name);
   const bind = `${name}`;
-  var relation = model_dsl.relations;
+  const relation = model_dsl.relations;
 
-  for (var i in relation) {
-    if (relation[i].type == "hasOne" && column.name == relation[i]["foreign"]) {
-      var field = Studio("remote.select", i, relation[i]);
-      var component: FieldColumn = {
+  for (const rel in relation) {
+    if (
+      relation[rel].type == "hasOne" &&
+      column.name == relation[rel]["foreign"]
+    ) {
+      const field = Studio("remote.select", rel, relation[rel]);
+      let component: FieldColumn = {
         bind: bind,
         view: { props: props, type: "Text" },
         edit: {
@@ -81,7 +86,7 @@ export function EditSelect(
                 // "scripts." + relation[i].model + "." + i + ".GetSelect",
                 // process: "models." + relation[i]["model"] + ".Get",
                 query: {
-                  model: Studio("file.DotName", relation[i].model),
+                  model: Studio("file.DotName", relation[rel].model),
                   label: field,
                   value: "id",
                 },
@@ -90,7 +95,7 @@ export function EditSelect(
           },
         },
       };
-      component = Withs(component, i);
+      component = Withs(component, rel);
       return component;
     }
   }
@@ -100,7 +105,7 @@ export function EditSelect(
 function Withs(component: FieldColumn, relation_name: string) {
   // "option": { "withs": { "user": {} } }
 
-  var withs = [];
+  const withs = [];
   withs.push({
     name: relation_name,
   });
@@ -112,11 +117,11 @@ function Withs(component: FieldColumn, relation_name: string) {
  * 把hasMany变成列表
  */
 export function Table(form_dsl: YaoForm.FormDSL, model_dsl: YaoModel.ModelDSL) {
-  var relation = model_dsl.relations;
-  for (var rel in relation) {
+  const relation = model_dsl.relations;
+  for (const rel in relation) {
     // console.log(`translate.translate:${i}`);
 
-    var translate = Studio("relation.translate", rel);
+    const translate = Studio("relation.translate", rel);
     if (relation[rel].type == "hasMany") {
       form_dsl.fields.form["表格" + translate] = {
         bind: "id",

@@ -15,9 +15,9 @@ export function Move(dir: string, name: string) {
 
   // 如果表已经存在,则
   if (Exists(dir, name)) {
+    // console.log("makdir:", base_dir + "/" + new_dir);
     Mkdir(base_dir + "/" + new_dir);
     Copy(target_name, base_dir + "/" + new_dir, name);
-
     // 复制完成后,删除文件
     fs.Remove(target_name);
   } else {

@@ -32,7 +32,7 @@ export function hasMany_id(
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
   if (field_name.indexOf("_id") != -1) {
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     for (const i in all_table) {
       const target = field_name.replace("_id", "");
@@ -40,7 +40,7 @@ export function hasMany_id(
       if (target == all_table[i]["table"]["name"]) {
         all_table[i]["relations"][table_name] = {
           type: "hasMany",
-          model: model_name,
+          model: dotName,
           key: field_name,
           foreign: "id",
           query: {},
@@ -58,7 +58,7 @@ export function hasMany_ID(
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
   if (field_name.indexOf("ID") != -1) {
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     for (const i in all_table) {
       const target = field_name.replace("ID", "");
@@ -66,7 +66,7 @@ export function hasMany_ID(
       if (target == all_table[i]["table"]["name"]) {
         all_table[i]["relations"][table_name] = {
           type: "hasMany",
-          model: model_name,
+          model: dotName,
           key: field_name,
           foreign: "id",
           query: {},
@@ -84,7 +84,7 @@ export function hasMany_Id(
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
   if (field_name.indexOf("Id") != -1) {
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     for (const i in all_table) {
       const target = field_name.replace("Id", "");
@@ -92,7 +92,7 @@ export function hasMany_Id(
       if (target == all_table[i]["table"]["name"]) {
         all_table[i]["relations"][table_name] = {
           type: "hasMany",
-          model: model_name,
+          model: dotName,
           key: field_name,
           foreign: "id",
           query: {},
@@ -112,7 +112,7 @@ export function PerfixhasMany_id(
 
   if (field_name.indexOf("_id") != -1) {
     const prefix = Studio("schema.TablePrefix");
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     for (const i in all_table) {
       for (const j in prefix) {
@@ -120,7 +120,7 @@ export function PerfixhasMany_id(
         if (target == all_table[i]["table"]["name"]) {
           all_table[i]["relations"][table_name] = {
             type: "hasMany",
-            model: model_name,
+            model: dotName,
             key: field_name,
             foreign: "id",
             query: {},
@@ -142,7 +142,7 @@ export function PerfixhasMany_ID(
 
   if (field_name.indexOf("ID") != -1) {
     const prefix = Studio("schema.TablePrefix");
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     for (const i in all_table) {
       for (const j in prefix) {
@@ -150,7 +150,7 @@ export function PerfixhasMany_ID(
         if (target == all_table[i]["table"]["name"]) {
           all_table[i]["relations"][table_name] = {
             type: "hasMany",
-            model: model_name,
+            model: dotName,
             key: field_name,
             foreign: "id",
             query: {},
@@ -171,7 +171,7 @@ export function PerfixhasMany_Id(
 
   if (field_name.indexOf("Id") != -1) {
     const prefix = Studio("schema.TablePrefix");
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     for (const i in all_table) {
       for (const j in prefix) {
@@ -179,7 +179,7 @@ export function PerfixhasMany_Id(
         if (target == all_table[i]["table"]["name"]) {
           all_table[i]["relations"][table_name] = {
             type: "hasMany",
-            model: model_name,
+            model: dotName,
             key: field_name,
             foreign: "id",
             query: {},

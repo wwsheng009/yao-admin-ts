@@ -10,7 +10,7 @@
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
       "program": "${file}",
-      //   "preLaunchTask": "tsc: build",
+      "preLaunchTask": "tsc: build",
       "cwd": "${workspaceFolder}",
       "outFiles": [
         //"sourceMap": true
@@ -22,8 +22,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "ts-node  file",
+      "name": "TypeScript file",
       "runtimeExecutable": "node",
+      "preLaunchTask": "tsc: build",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -36,7 +37,7 @@
       "args": [
         "-r",
         "tsconfig-paths/register", //解析@=>src
-        "${file}"
+        "${workspaceFolder}/src/debugger/index.ts" //"${file}"
       ],
       "skipFiles": ["<node_internals>/**", "node_modules/**"]
     }

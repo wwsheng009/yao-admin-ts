@@ -1,7 +1,7 @@
-import { FS, Process, Studio } from "yao-node-client";
+import { FS, Studio } from "yao-node-client";
 import { YaoFlow, YaoMenu } from "yao-app-ts-types";
 
-function Create(model_dsl: any[]) {
+export function Create(model_dsl: any[]) {
   let insert = [] as YaoMenu.MenuItems;
   // let child = [];
   const total = model_dsl.length;
@@ -77,8 +77,7 @@ function Create(model_dsl: any[]) {
   };
 
   const json = JSON.stringify(dsl);
-  console.log(`create menu:/flows/app/menu.flow.json`);
-
+  // console.log(`create menu:/flows/app/menu.flow.json`);
   fs.WriteFile("/flows/app/menu.flow.json", json);
 
   // 创建看板
@@ -95,7 +94,7 @@ function Create(model_dsl: any[]) {
  * 获取菜单图标
  * @param {*} name
  */
-function GetIcon(name: string) {
+export function GetIcon(name: string) {
   // let url = "https://brain.yaoapps.com/api/icon/search?name=" + name;
   // let response = Process("xiang.network.Get", url, {}, {});
   // if (response.status == 200) {

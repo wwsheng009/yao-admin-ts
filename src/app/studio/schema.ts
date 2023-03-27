@@ -41,7 +41,7 @@ export function Relation() {
     if (guards.indexOf(all_table[i]) != -1) {
       continue;
     }
-    console.log(`process table Relation:${all_table[i]}`);
+    //console.log(`process table Relation:${all_table[i]}`);
     const col = GetTable(all_table[i]);
     //col.columns = Studio("relation.BatchTranslate", col.columns);
     // console.log(col.columns);

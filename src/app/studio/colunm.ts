@@ -1,4 +1,4 @@
-import { Studio } from "yao-node-client";
+import { log, Studio } from "yao-node-client";
 import { YaoComponent, YaoForm, YaoModel, YaoTable } from "yao-app-ts-types";
 import { FieldColumn, FormDefinition, TableDefinition } from "./types";
 
@@ -43,7 +43,7 @@ export function getType(): { [key: string]: YaoComponent.EditComponentEnum } {
 export function Hidden(isTable: boolean) {
   let hidden: string[] = [];
   if (isTable) {
-    // 不展示的名单列表
+    // Table页面不展示的字段列表
     hidden = [
       "secret",
       "password",
@@ -55,6 +55,7 @@ export function Hidden(isTable: boolean) {
       "deleted",
     ];
   } else {
+    // Form页面不展示的字段列表
     hidden = [
       "del",
       "delete",
@@ -222,21 +223,20 @@ export function castTableColumn(
   // 不展示隐藏列
   let hidden = Hidden(true);
   if (hidden.indexOf(name) != -1) {
-    console.log("castTableColumn: hidden");
+    // console.log("castTableColumn: hidden");
     return false;
   }
   const typeMapping = getType();
 
   if (!name) {
-    console.log("castTableColumn: missing name");
-    // log.Error("castTableColumn: missing name");
+    // console.log("castTableColumn: missing name");
+    log.Error("castTableColumn: missing name");
     return false;
   }
 
   if (!title) {
-    console.log("castTableColumn: missing title");
-
-    //log.Error("castTableColumn: missing title");
+    // console.log("castTableColumn: missing title");
+    log.Error("castTableColumn: missing title");
     return false;
   }
 
@@ -285,7 +285,13 @@ export function castTableColumn(
         },
         type: "Select",
       },
-      view: { props: {}, type: "Text" },
+      view: {
+        props: {
+          options: Enum(column["option"]),
+          placeholder: "请选择" + title,
+        },
+        type: "Tag",
+      },
     };
 
     res.layout.table.columns.push({
@@ -301,7 +307,7 @@ export function castTableColumn(
       });
     }
   }
-
+  //检查是否下拉框显示
   component = Studio("selector.Select", column, model_dsl, component);
   // 如果是下拉的,则增加查询条件
   if (component.is_select) {
@@ -331,6 +337,7 @@ export function castTableColumn(
       }
     }
   }
+  delete component.is_select;
   component = Studio("file.File", column, component);
 
   // component.edit = { type: "input", props: { value: bind } };

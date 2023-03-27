@@ -36,9 +36,10 @@ export function File(
         },
         edit: {
           type: "Upload",
+          compute: "Upload",
           //compute: "scripts.file.image.ImagesEdit",
           props: {
-            filetype: "Image",
+            filetype: "image",
             disabled: true,
             $api: {
               process: "fs.system.Upload",
@@ -101,7 +102,7 @@ export function FormFile(
           },
           // compute: "scripts.file.image.ImagesEdit",
           props: {
-            filetype: "Image",
+            filetype: "image",
             $api: { process: "fs.system.Upload" },
           },
         },

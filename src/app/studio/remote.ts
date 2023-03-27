@@ -4,7 +4,7 @@ import { FS, Process, Studio } from "yao-node-client";
 export function select(relation_name: any, relation: { model: any }) {
   let model: YaoModel.ModelDSL = Process(
     "schemas.default.TableGet",
-    relation.model
+    relation_name
   );
   const columns = model.columns;
   let res = Speculation(columns);
@@ -30,6 +30,7 @@ export function Speculation(column: YaoModel.ModelColumn[]) {
   }
   return false;
 }
+
 export function GetTarget(target: string, column: YaoModel.ModelColumn[]) {
   for (const i in column) {
     if (column[i].name.indexOf(target) != -1) {

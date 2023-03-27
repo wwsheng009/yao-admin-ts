@@ -29,13 +29,13 @@ export function Create(model_dsl: YaoModel.ModelDSL[]) {
     let form_dsl = Studio("colunm.toForm", model_dsl[i]); //这里有studio js读取操作
     let form = JSON.stringify(form_dsl);
     Studio("move.Move", "forms", form_flie_name);
-    console.log(`create form:/forms/"${table_file_name}.mod.json`);
+    //console.log(`create form:/forms/"${table_file_name}.mod.json`);
 
     fs.WriteFile("/forms/" + form_flie_name, form);
 
     //需要把写操作入在最后面操作。在开发环境中，对dsl文件的修改会导致脚本重加载，如果在studio.service写操作的过程中去执行js文件会报错。
     Studio("move.Move", "tables", table_file_name);
-    console.log(`create table:/tables/"${table_file_name}.mod.json`);
+    //console.log(`create table:/tables/"${table_file_name}.mod.json`);
 
     fs.WriteFile("/tables/" + table_file_name, table);
   }

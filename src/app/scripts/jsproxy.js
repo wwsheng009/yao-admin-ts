@@ -1,38 +1,24 @@
 //代理js api请求
-
-import { Store, Studio, WebSocket } from "yao-node-client";
-import { Exception, Process, Query } from "yao-node-client";
-import { $L, FS, http, log } from "yao-node-client";
-
+// import { Store, Studio, WebSocket } from "yao-node-client";
+// import { Exception, Process, Query } from "yao-node-client";
+// import { $L, FS, http, log } from "yao-node-client";
 /**
  * api 代理服务，可以放在yao应用下
  * @param {object} payload
  * @returns
  */
-export function Server(payload: {
-  type: string;
-  method: string;
-  args?: any;
-  space?: any;
-  key?: any;
-  value?: any;
-  url?: string | URL;
-  protocols?: string;
-  message?: any;
-}) {
+function Server(payload) {
   // console.log("request received");
   // console.log(payload);
   // log.Info("debug served called");
   // log.Info(payload);
-
   // JSON.stringify({'a':null,'b':undefined})
   // '{"a":null}'
-
   let resp = {
-    code: 200 as number,
-    message: "" as string,
+    code: 200,
+    message: "",
     // error: null as Error, //undefined不会出现在返回json key中
-    data: null as any,
+    data: null,
   };
   try {
     const type = payload.type;
@@ -103,19 +89,17 @@ export function Server(payload: {
   }
   return resp;
 }
-
 // 在外部按这个格式进行封装
 // function MyProcess(...args: any[]) {
 //   return Process("scripts.jsproxy.RemoteProcess",'scripts.ping.Ping' ...args);
 // }
-
 /**
  * 调用远程处理器，并返回处理结果
  * @param method 远程处理器方法
  * @param args 远程处理器参数
  * @returns 远程处理器结果
  */
-export function RemoteProcess(method: string, ...args: any[]) {
+function RemoteProcess(method, ...args) {
   if (!(typeof method === "string")) {
     throw new Exception(`方法格式不正确,方法名不是字符串${method}`, 500);
   }
@@ -124,7 +108,6 @@ export function RemoteProcess(method: string, ...args: any[]) {
     throw new Exception(`方法格式不正确，没有命名空间${method}`, 500);
   }
   const type = types[0].toLowerCase();
-
   if (!["scripts", "services", "studio"].includes(type)) {
     throw new Exception(
       `不支持的方法,只支持调用scripts/services/studio,${method}`,
@@ -133,7 +116,6 @@ export function RemoteProcess(method: string, ...args: any[]) {
   }
   return RemoteClient("Process", method, ...args);
 }
-
 /**
  * 远程api接口
  * @param type 处理器类型scripts/services/studio
@@ -141,10 +123,9 @@ export function RemoteProcess(method: string, ...args: any[]) {
  * @param args 任何参数
  * @returns 远程处理器的结果
  */
-function RemoteClient(type: string, method: string, ...args: any[]) {
+function RemoteClient(type, method, ...args) {
   // let ret = http.Post(process.env.REMOTE_DEBUG_SERVER, {
   let server = Process("utils.env.Get", "REMOTE_DEBUG_SERVER");
-
   let ret = http.Post(server, {
     method: method,
     type: type,

@@ -4,5 +4,6 @@
     "module": "ESNext",
     "sourceMap": false,
     "outDir": "dist_esm",
+    "declaration": false //not to generate the d.tsfiles
   }
 }

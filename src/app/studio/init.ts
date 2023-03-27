@@ -1,4 +1,4 @@
-import { Exception } from "yao-node-client";
+import { Exception, Studio } from "yao-node-client";
 import { FS, Process } from "yao-node-client";
 
 //在form与table配置中，yao可以只配置简单的与模型的绑定关系就能带出所有的配置，
@@ -156,7 +156,6 @@ function CreateTable(table: string) {
     filename.slice(0, -4) + "default.json",
     JSON.stringify(newTable)
   );
-  console.log(rc);
 }
 
 /**
@@ -291,7 +290,6 @@ function CreateForm(form: string) {
     filename.slice(0, -4) + "default.json",
     JSON.stringify(newForm)
   );
-  console.log(rc);
 }
 
 /**
@@ -333,7 +331,6 @@ function test_delete_object_key() {
     ],
   };
   deleteObjectKey(obj, "id");
-  console.log(obj);
 }
 /**
  * create default table and table config json file

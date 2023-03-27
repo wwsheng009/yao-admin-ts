@@ -19,7 +19,7 @@ export function hasOne(table_name: string, all_table: YaoModel.ModelDSL[]) {
 export function hasOne_id(table_name: string, all_table: YaoModel.ModelDSL[]) {
   // 先判断hasOne
   const foreign_id = table_name + "_id";
-  const model_name = Studio("file.DotName", table_name);
+  const dotName = Studio("file.DotName", table_name);
 
   for (const i in all_table) {
     const temp_column = all_table[i]["columns"];
@@ -27,7 +27,7 @@ export function hasOne_id(table_name: string, all_table: YaoModel.ModelDSL[]) {
       if (temp_column[j]["name"] == foreign_id) {
         all_table[i]["relations"][table_name] = {
           type: "hasOne",
-          model: model_name,
+          model: dotName,
           key: "id",
           foreign: foreign_id,
           query: {},
@@ -40,7 +40,7 @@ export function hasOne_id(table_name: string, all_table: YaoModel.ModelDSL[]) {
 export function hasOneID(table_name: string, all_table: YaoModel.ModelDSL[]) {
   // 先判断hasOne
   const foreign_id = table_name + "ID";
-  const model_name = Studio("file.DotName", table_name);
+  const dotName = Studio("file.DotName", table_name);
 
   for (const i in all_table) {
     const temp_column = all_table[i]["columns"];
@@ -48,7 +48,7 @@ export function hasOneID(table_name: string, all_table: YaoModel.ModelDSL[]) {
       if (temp_column[j]["name"] == foreign_id) {
         all_table[i]["relations"][table_name] = {
           type: "hasOne",
-          model: model_name,
+          model: dotName,
           key: "id",
           foreign: foreign_id,
           query: {},
@@ -61,7 +61,7 @@ export function hasOneID(table_name: string, all_table: YaoModel.ModelDSL[]) {
 export function hasOneId(table_name: string, all_table: YaoModel.ModelDSL[]) {
   // 先判断hasOne
   const foreign_id = table_name + "Id";
-  const model_name = Studio("file.DotName", table_name);
+  const dotName = Studio("file.DotName", table_name);
 
   for (const i in all_table) {
     const temp_column = all_table[i]["columns"];
@@ -69,7 +69,7 @@ export function hasOneId(table_name: string, all_table: YaoModel.ModelDSL[]) {
       if (temp_column[j]["name"] == foreign_id) {
         all_table[i]["relations"][table_name] = {
           type: "hasOne",
-          model: model_name,
+          model: dotName,
           key: "id",
           foreign: foreign_id,
           query: {},
@@ -93,7 +93,7 @@ export function PrefixHasOne_id(
   const prefix = Studio("schema.TablePrefix");
 
   if (prefix.length) {
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     // 获取表前缀
     const target = Studio("schema.ReplacePrefix", prefix, table_name);
@@ -105,7 +105,7 @@ export function PrefixHasOne_id(
         if (temp_column[j]["name"] == foreign_id) {
           all_table[i]["relations"][table_name] = {
             type: "hasOne",
-            model: model_name,
+            model: dotName,
             key: "id",
             foreign: foreign_id,
             query: {},
@@ -132,7 +132,7 @@ export function PrefixhasOneID(
     // 获取表前缀
     const target = Studio("schema.ReplacePrefix", prefix, table_name);
     const foreign_id = target + "ID";
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     for (const i in all_table) {
       const temp_column = all_table[i]["columns"];
@@ -140,7 +140,7 @@ export function PrefixhasOneID(
         if (temp_column[j]["name"] == foreign_id) {
           all_table[i]["relations"][table_name] = {
             type: "hasOne",
-            model: model_name,
+            model: dotName,
             key: "id",
             foreign: foreign_id,
             query: {},
@@ -167,7 +167,7 @@ export function PrefixhasOneId(
     // 获取表前缀
     const target = Studio("schema.ReplacePrefix", prefix, table_name);
     const foreign_id = target + "Id";
-    const model_name = Studio("file.DotName", table_name);
+    const dotName = Studio("file.DotName", table_name);
 
     for (const i in all_table) {
       const temp_column = all_table[i]["columns"];
@@ -175,7 +175,7 @@ export function PrefixhasOneId(
         if (temp_column[j]["name"] == foreign_id) {
           all_table[i]["relations"][table_name] = {
             type: "hasOne",
-            model: model_name,
+            model: dotName,
             key: "id",
             foreign: foreign_id,
             query: {},

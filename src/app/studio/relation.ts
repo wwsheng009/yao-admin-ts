@@ -14,6 +14,7 @@ export function child(
   columns: YaoModel.ModelColumn[],
   table_struct: YaoModel.ModelDSL
 ) {
+  const dotName = Studio("file.DotName", model_name);
   for (const i in columns) {
     if (columns[i]["type"] != "integer") {
       continue;
@@ -21,7 +22,7 @@ export function child(
     if (children.indexOf(columns[i]["name"]) != -1) {
       table_struct.relations.children = {
         type: "hasMany",
-        model: Studio("file.DotName", model_name),
+        model: dotName,
         key: columns[i]["name"],
         foreign: "id",
         query: {},
@@ -44,6 +45,7 @@ export function parent(
   columns: YaoModel.ModelColumn[],
   table_struct: YaoModel.ModelDSL
 ) {
+  const dotName = Studio("file.DotName", model_name);
   for (let i in columns) {
     if (columns[i]["type"] != "integer") {
       continue;
@@ -51,7 +53,7 @@ export function parent(
     if (parents.indexOf(columns[i]["name"]) != -1) {
       table_struct.relations.parent = {
         type: "hasOne",
-        model: Studio("file.DotName", model_name),
+        model: dotName,
         key: "id",
         foreign: columns[i]["name"],
         query: {},
@@ -64,9 +66,9 @@ export function parent(
 
 export function other(all_table_struct: YaoModel.ModelDSL[]) {
   for (const i in all_table_struct) {
-    console.log(
-      `process table Relation:${all_table_struct[i]["table"]["name"]}`
-    );
+    // console.log(
+    //   `process table Relation:${all_table_struct[i]["table"]["name"]}`
+    // );
 
     const temp = all_table_struct[i]["columns"];
     all_table_struct = Studio(

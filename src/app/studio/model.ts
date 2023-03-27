@@ -6,16 +6,18 @@ import { FS, Studio } from "yao-node-client";
  * 创建模型
  */
 export function Create() {
-  console.log(Date.now() / 1000);
+  const start = Math.floor(Date.now() / 1000);
+
   const model_dsl = CreateModels();
-  console.log(Date.now() / 1000);
+  console.log(`Create Modes:${Math.floor(Date.now() / 1000) - start} seconds`);
   // 创建表格dsl
   Studio("table.Create", model_dsl);
   version10_0_3();
   login();
   // 创建菜单
   Studio("menu.Create", model_dsl);
-  console.log(Date.now() / 1000);
+
+  console.log(`Total:${Math.floor(Date.now() / 1000) - start} seconds`);
 }
 
 /**
@@ -30,7 +32,7 @@ export function CreateModels() {
     const table_file_name = table_name + ".mod.json";
     const table = JSON.stringify(model_dsl[i]);
     Studio("move.Move", "models", table_file_name);
-    console.log(`create model:/models/"${table_file_name}.mod.json`);
+    //console.log(`create model:/models/"${table_file_name}.mod.json`);
     fs.WriteFile("/models/" + table_file_name, table);
   }
   return model_dsl;
@@ -39,8 +41,7 @@ export function CreateModels() {
 ///yao studio run model.CreateOne address
 export function CreateOne(model_name: string) {
   let model_file_name = Studio("file.SlashName", model_name);
-  console.log("进入studio");
-  // console.log(model_name);
+
   const fs = new FS("dsl");
   let model_dsl = [];
 

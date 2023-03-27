@@ -11,7 +11,7 @@ export function Create(menu_arr: YaoMenu.MenuItem[], type: number) {
 
   Studio("move.Move", "charts", "dashboard.chart.json");
   let dsl = Dsl(menu_arr, type);
-  console.log(`create dashboard:/charts/dashboard.chart.json"`);
+  //console.log(`create dashboard:/charts/dashboard.chart.json"`);
   fs.WriteFile("/charts/" + "dashboard.chart.json", JSON.stringify(dsl));
 }
 /**
@@ -66,11 +66,15 @@ export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
     script.model_count = script.table_count;
     temp.forEach((col) => {
       if (col.id != 1) {
-        let title = col.name + "(" + col.model + ")" + "记录数";
+        const dotName = Studio("file.DotName", col.model);
+        const title = dotName + "记录数";
+        // if (col.name != col.model) {
+        //   title = col.name + "(" + dotName + ")" + "记录数";
+        // }
         script[col.model] = GetCount(col.model);
         chart[title] = {
           bind: col.model,
-          link: "/x/Table/" + col.model,
+          link: "/x/Table/" + dotName,
           view: { type: "Number", props: { unit: "条" } },
         };
         columns.push({ name: title, width: 6 });
@@ -82,11 +86,15 @@ export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
 
     menu_arr.forEach((col) => {
       if (col.id != 1) {
-        let title = col.name + "(" + col.model + ")" + "记录数";
+        const dotName = Studio("file.DotName", col.model);
+        const title = dotName + "记录数";
+        // if (col.name != col.model) {
+        //   title = col.name + "(" + dotName + ")" + "记录数";
+        // }
         script[col.model] = GetCount(col.model);
         chart[title] = {
           bind: col.model,
-          link: "/x/Table/" + col.model,
+          link: "/x/Table/" + dotName,
           view: { type: "Number", props: { unit: "条" } },
         };
         columns.push({ name: title, width: 6 });
@@ -102,7 +110,7 @@ export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
 export function WriteScript(datai: object) {
   let data = JSON.stringify(datai);
   let sc = new FS("script");
-  let scripts = `export function Data() {
+  let scripts = `function Data() {
     return ${data}
   }`;
   sc.WriteFile("/dashboard.js", scripts);
