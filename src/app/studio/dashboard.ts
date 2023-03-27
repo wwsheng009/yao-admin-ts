@@ -1,17 +1,30 @@
-function Create(menu_arr, type) {
-  var fs = new FS("dsl");
+import { YaoChart, YaoComponent, YaoMenu } from "yao-app-ts-types";
+import { FS, Query, Studio } from "yao-node-client";
+
+/**
+ * 根据菜单创建图表
+ * @param menu_arr 菜单列表
+ * @param type 类型，1是二级菜单，2是一级菜单
+ */
+export function Create(menu_arr: YaoMenu.MenuItem[], type: number) {
+  const fs = new FS("dsl");
 
   Studio("move.Move", "charts", "dashboard.chart.json");
-  var dsl = Dsl(menu_arr, type);
-  var dsl = JSON.stringify(dsl);
+  let dsl = Dsl(menu_arr, type);
   console.log(`create dashboard:/charts/dashboard.chart.json"`);
-  fs.WriteFile("/charts/" + "dashboard.chart.json", dsl);
+  fs.WriteFile("/charts/" + "dashboard.chart.json", JSON.stringify(dsl));
 }
-function Dsl(menu_arr, type) {
-  var dsl = {
+/**
+ * 根据菜单创建图表
+ * @param menu_arr 菜单列表
+ * @param type 类型，1是二级菜单，2是一级菜单
+ * @returns
+ */
+export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
+  let dsl: YaoChart.ChartDSL = {
     name: "数据图表",
     action: {
-      data: { process: "scripts.dashboard.Data", default: ["2022-09-20"] },
+      data: { process: "scripts.dashboard.Data", default: ["2023-03-27"] },
     },
     layout: {
       operation: {
@@ -27,10 +40,9 @@ function Dsl(menu_arr, type) {
       chart: {},
     },
   };
-  var chart = {
+  let chart: { [key: string]: any } = {
     表格数量: {
       bind: "table_count",
-
       view: { type: "Number", props: { unit: "个" } },
     },
     模型数量: {
@@ -38,23 +50,23 @@ function Dsl(menu_arr, type) {
       view: { type: "Number", props: { unit: "个" } },
     },
   };
-  var columns = [
+  let columns: YaoComponent.LayoutColumnDSL[] = [
     { name: "表格数量", width: 12 },
     { name: "模型数量", width: 12 },
   ];
-  var script = {
+  let script: { [key: string]: any } = {
     table_count: 0,
     model_count: 0,
   };
 
   // 说明是二级菜单
   if (type == 1) {
-    var temp = menu_arr[1]["children"];
+    let temp = menu_arr[1]["children"];
     script.table_count = temp.length;
     script.model_count = script.table_count;
     temp.forEach((col) => {
       if (col.id != 1) {
-        var title = col.name + "(" + col.model + ")" + "记录数";
+        let title = col.name + "(" + col.model + ")" + "记录数";
         script[col.model] = GetCount(col.model);
         chart[title] = {
           bind: col.model,
@@ -70,7 +82,7 @@ function Dsl(menu_arr, type) {
 
     menu_arr.forEach((col) => {
       if (col.id != 1) {
-        var title = col.name + "(" + col.model + ")" + "记录数";
+        let title = col.name + "(" + col.model + ")" + "记录数";
         script[col.model] = GetCount(col.model);
         chart[title] = {
           bind: col.model,
@@ -87,19 +99,19 @@ function Dsl(menu_arr, type) {
   WriteScript(script);
   return dsl;
 }
-function WriteScript(data) {
-  var data = JSON.stringify(data);
-  var sc = new FS("script");
-  var scripts = `function Data() {
+export function WriteScript(datai: object) {
+  let data = JSON.stringify(datai);
+  let sc = new FS("script");
+  let scripts = `export function Data() {
     return ${data}
   }`;
   sc.WriteFile("/dashboard.js", scripts);
 }
 
-function GetCount(model) {
+export function GetCount(model: string) {
   try {
-    var query = new Query();
-    var res = query.Get({
+    let query = new Query();
+    let res = query.Get({
       select: [":COUNT(id) as 数量"],
       from: model,
     });

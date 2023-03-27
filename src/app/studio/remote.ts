@@ -1,9 +1,15 @@
-function select(relation_name, relation) {
-  var column = Process("schemas.default.TableGet", relation.model);
-  var column = column.columns;
-  var res = Speculation(column);
+import { YaoModel } from "yao-app-ts-types";
+import { FS, Process, Studio } from "yao-node-client";
+
+export function select(relation_name: any, relation: { model: any }) {
+  let model: YaoModel.ModelDSL = Process(
+    "schemas.default.TableGet",
+    relation.model
+  );
+  const columns = model.columns;
+  let res = Speculation(columns);
   if (!res) {
-    var res = Other(column);
+    res = Other(columns);
   }
   //CreateScripts(relation_name, res, relation);
   return res;
@@ -14,18 +20,18 @@ function select(relation_name, relation) {
  * @param {*} column
  * @returns
  */
-function Speculation(column) {
-  var target = ["name", "title"];
-  for (var i in target) {
-    var res = GetTarget(target[i], column);
+export function Speculation(column: YaoModel.ModelColumn[]) {
+  const target = ["name", "title"];
+  for (const i in target) {
+    const res = GetTarget(target[i], column);
     if (res) {
       return res;
     }
   }
   return false;
 }
-function GetTarget(target, column) {
-  for (var i in column) {
+export function GetTarget(target: string, column: YaoModel.ModelColumn[]) {
+  for (const i in column) {
     if (column[i].name.indexOf(target) != -1) {
       return column[i].name;
     }
@@ -35,14 +41,13 @@ function GetTarget(target, column) {
 
 /**
  * 没有其他的话,就找个string类型的
- * @param {*} column
+ * @param {*} columns
  * @returns
  */
-function Other(column) {
-  for (var i in column) {
-    console.log(column[i].type);
-    if (column[i].type == "string") {
-      return column[i].name;
+export function Other(columns: YaoModel.ModelColumn[]) {
+  for (const i in columns) {
+    if (columns[i].type == "string") {
+      return columns[i].name;
     }
   }
   return "id";
@@ -53,28 +58,32 @@ function Other(column) {
  * @param {*} relation_name
  * @param {*} name
  */
-function CreateScripts(relation_name, name, relation) {
-  var field_name = relation_name + ".js";
-  var fs = new FS("script");
-  var form_dsl = `function GetSelect() {
-    var query = new Query();
-    var res = query.Get({
+export function CreateScripts(
+  relation_name: string,
+  name: string,
+  relation: YaoModel.Relation
+) {
+  const field_name = relation_name + ".js";
+  const fs = new FS("script");
+  const form_dsl = `export function GetSelect() {
+    let query = new Query();
+    let res = query.Get({
       select: ["id as value", "${name} as label"],
       from: "${relation.model}",
     });
     return res;
   }
   `;
-  var dir = relation.model + "/" + field_name;
+  const dir = relation.model + "/" + field_name;
   //console.log(form_dsl);
 
   Studio("move.Move", "scripts", field_name);
   fs.WriteFile("/" + dir, form_dsl);
 }
 
-// function GetSelect() {
-//   var query = new Query();
-//   var res = query.Get({
+// export function GetSelect() {
+//   let query = new Query();
+//   let res = query.Get({
 //     select: ["id as value", "${name} as label"],
 //     from: "${relation_name}",
 //   });

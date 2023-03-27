@@ -1,4 +1,7 @@
-function hasOne(table_name, all_table) {
+import { YaoModel } from "yao-app-ts-types";
+import { Studio } from "yao-node-client";
+
+export function hasOne(table_name: string, all_table: YaoModel.ModelDSL[]) {
   const relation = [
     "hasOne_id",
     "hasOneID",
@@ -7,20 +10,20 @@ function hasOne(table_name, all_table) {
     "PrefixhasOneID",
     "PrefixhasOneId",
   ];
-  for (var i in relation) {
+  for (let i in relation) {
     all_table = Studio("hasone." + relation[i], table_name, all_table);
   }
   return all_table;
 }
 
-function hasOne_id(table_name, all_table) {
+export function hasOne_id(table_name: string, all_table: YaoModel.ModelDSL[]) {
   // 先判断hasOne
-  var foreign_id = table_name + "_id";
+  const foreign_id = table_name + "_id";
   const model_name = Studio("file.DotName", table_name);
 
-  for (var i in all_table) {
-    var temp_column = all_table[i]["columns"];
-    for (var j in temp_column) {
+  for (const i in all_table) {
+    const temp_column = all_table[i]["columns"];
+    for (const j in temp_column) {
       if (temp_column[j]["name"] == foreign_id) {
         all_table[i]["relations"][table_name] = {
           type: "hasOne",
@@ -34,14 +37,14 @@ function hasOne_id(table_name, all_table) {
   }
   return all_table;
 }
-function hasOneID(table_name, all_table) {
+export function hasOneID(table_name: string, all_table: YaoModel.ModelDSL[]) {
   // 先判断hasOne
-  var foreign_id = table_name + "ID";
+  const foreign_id = table_name + "ID";
   const model_name = Studio("file.DotName", table_name);
 
-  for (var i in all_table) {
-    var temp_column = all_table[i]["columns"];
-    for (var j in temp_column) {
+  for (const i in all_table) {
+    const temp_column = all_table[i]["columns"];
+    for (const j in temp_column) {
       if (temp_column[j]["name"] == foreign_id) {
         all_table[i]["relations"][table_name] = {
           type: "hasOne",
@@ -55,14 +58,14 @@ function hasOneID(table_name, all_table) {
   }
   return all_table;
 }
-function hasOneId(table_name, all_table) {
+export function hasOneId(table_name: string, all_table: YaoModel.ModelDSL[]) {
   // 先判断hasOne
-  var foreign_id = table_name + "Id";
+  const foreign_id = table_name + "Id";
   const model_name = Studio("file.DotName", table_name);
 
-  for (var i in all_table) {
-    var temp_column = all_table[i]["columns"];
-    for (var j in temp_column) {
+  for (const i in all_table) {
+    const temp_column = all_table[i]["columns"];
+    for (const j in temp_column) {
       if (temp_column[j]["name"] == foreign_id) {
         all_table[i]["relations"][table_name] = {
           type: "hasOne",
@@ -83,19 +86,22 @@ function hasOneId(table_name, all_table) {
  * @param {*} prefix
  * @returns
  */
-function PrefixHasOne_id(table_name, all_table) {
-  var prefix = Studio("schema.TablePrefix");
+export function PrefixHasOne_id(
+  table_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
+  const prefix = Studio("schema.TablePrefix");
 
   if (prefix.length) {
     const model_name = Studio("file.DotName", table_name);
 
     // 获取表前缀
-    var target = Studio("schema.ReplacePrefix", prefix, table_name);
-    var foreign_id = target + "_id";
+    const target = Studio("schema.ReplacePrefix", prefix, table_name);
+    const foreign_id = target + "_id";
 
-    for (var i in all_table) {
-      var temp_column = all_table[i]["columns"];
-      for (var j in temp_column) {
+    for (const i in all_table) {
+      const temp_column = all_table[i]["columns"];
+      for (const j in temp_column) {
         if (temp_column[j]["name"] == foreign_id) {
           all_table[i]["relations"][table_name] = {
             type: "hasOne",
@@ -117,17 +123,20 @@ function PrefixHasOne_id(table_name, all_table) {
  * @param {*} prefix
  * @returns
  */
-function PrefixhasOneID(table_name, all_table) {
-  var prefix = Studio("schema.TablePrefix");
+export function PrefixhasOneID(
+  table_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
+  const prefix = Studio("schema.TablePrefix");
   if (prefix.length) {
     // 获取表前缀
-    var target = Studio("schema.ReplacePrefix", prefix, table_name);
-    var foreign_id = target + "ID";
+    const target = Studio("schema.ReplacePrefix", prefix, table_name);
+    const foreign_id = target + "ID";
     const model_name = Studio("file.DotName", table_name);
 
-    for (var i in all_table) {
-      var temp_column = all_table[i]["columns"];
-      for (var j in temp_column) {
+    for (const i in all_table) {
+      const temp_column = all_table[i]["columns"];
+      for (const j in temp_column) {
         if (temp_column[j]["name"] == foreign_id) {
           all_table[i]["relations"][table_name] = {
             type: "hasOne",
@@ -149,17 +158,20 @@ function PrefixhasOneID(table_name, all_table) {
  * @param {*} prefix
  * @returns
  */
-function PrefixhasOneId(table_name, all_table) {
-  var prefix = Studio("schema.TablePrefix");
+export function PrefixhasOneId(
+  table_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
+  const prefix = Studio("schema.TablePrefix");
   if (prefix.length) {
     // 获取表前缀
-    var target = Studio("schema.ReplacePrefix", prefix, table_name);
-    var foreign_id = target + "Id";
+    const target = Studio("schema.ReplacePrefix", prefix, table_name);
+    const foreign_id = target + "Id";
     const model_name = Studio("file.DotName", table_name);
 
-    for (var i in all_table) {
-      var temp_column = all_table[i]["columns"];
-      for (var j in temp_column) {
+    for (const i in all_table) {
+      const temp_column = all_table[i]["columns"];
+      for (const j in temp_column) {
         if (temp_column[j]["name"] == foreign_id) {
           all_table[i]["relations"][table_name] = {
             type: "hasOne",

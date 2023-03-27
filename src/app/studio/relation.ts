@@ -1,3 +1,6 @@
+import { YaoModel } from "yao-app-ts-types";
+import { Studio } from "yao-node-client";
+
 const parents = ["parent", "parent_id", "pid"];
 const children = ["children", "children_id", "child", "child_id"];
 /**
@@ -6,8 +9,12 @@ const children = ["children", "children_id", "child", "child_id"];
  * @param {*} columns
  * @param {*} table_struct
  */
-function child(model_name, columns, table_struct) {
-  for (var i in columns) {
+export function child(
+  model_name: string,
+  columns: YaoModel.ModelColumn[],
+  table_struct: YaoModel.ModelDSL
+) {
+  for (const i in columns) {
     if (columns[i]["type"] != "integer") {
       continue;
     }
@@ -32,8 +39,12 @@ function child(model_name, columns, table_struct) {
  * @param {*} table_struct
  * @returns
  */
-function parent(model_name, columns, table_struct) {
-  for (var i in columns) {
+export function parent(
+  model_name: string,
+  columns: YaoModel.ModelColumn[],
+  table_struct: YaoModel.ModelDSL
+) {
+  for (let i in columns) {
     if (columns[i]["type"] != "integer") {
       continue;
     }
@@ -51,19 +62,19 @@ function parent(model_name, columns, table_struct) {
   return table_struct;
 }
 
-function other(all_table_struct) {
-  for (var i in all_table_struct) {
+export function other(all_table_struct: YaoModel.ModelDSL[]) {
+  for (const i in all_table_struct) {
     console.log(
       `process table Relation:${all_table_struct[i]["table"]["name"]}`
     );
 
-    var temp = all_table_struct[i]["columns"];
+    const temp = all_table_struct[i]["columns"];
     all_table_struct = Studio(
       "hasone.hasOne",
       all_table_struct[i]["table"]["name"],
       all_table_struct
     );
-    for (var j in temp) {
+    for (const j in temp) {
       all_table_struct = Studio(
         "hasmany.hasMany",
         all_table_struct[i]["table"]["name"],
@@ -77,13 +88,13 @@ function other(all_table_struct) {
 }
 
 // yao studio run relation.translate icon
-function translate(keywords) {
+export function translate(keywords: string) {
   if (keywords == "id" || keywords == "ID") {
     return "id";
   }
-  // var keywords = keywords.split("_");
+  // let keywords = keywords.split("_");
   //console.log(keywords);
-  // var url = "https://brain.yaoapps.com/api/keyword/column";
+  // let url = "https://brain.yaoapps.com/api/keyword/column";
   // let response = Process(
   //   "xiang.network.PostJSON",
   //   url,
@@ -92,12 +103,12 @@ function translate(keywords) {
   //   },
   //   {}
   // );
-  var res = keywords;
+  let res = keywords;
   // if (response.status == 200) {
   //   if (response.data.data) {
-  //     var res = "";
-  //     for (var i in response.data.data) {
-  //       var res = res + response.data.data[i]["label"];
+  //     let res = "";
+  //     for (let i in response.data.data) {
+  //       let res = res + response.data.data[i]["label"];
   //     }
   //   }
   // }
@@ -109,9 +120,9 @@ function translate(keywords) {
  * @param {*} keywords
  * @returns
  */
-function BatchTranslate(keywords) {
+export function BatchTranslate(keywords: string) {
   return keywords;
-  // var url = "https://brain.yaoapps.com/api/keyword/batch_column";
+  // let url = "https://brain.yaoapps.com/api/keyword/batch_column";
   // let response = Process(
   //   "xiang.network.PostJSON",
   //   url,
@@ -120,7 +131,7 @@ function BatchTranslate(keywords) {
   //   },
   //   {}
   // );
-  // var res = keywords;
+  // let res = keywords;
   // if (response.status == 200) {
   //   if (response.data.data) {
   //     // console.log(response.data.data);
@@ -134,9 +145,9 @@ function BatchTranslate(keywords) {
  * @param {*} keywords
  * @returns
  */
-function BatchModel(keywords) {
+export function BatchModel(keywords: string) {
   return keywords;
-  // var url = "https://brain.yaoapps.com/api/keyword/batch_model";
+  // let url = "https://brain.yaoapps.com/api/keyword/batch_model";
   // let response = Process(
   //   "xiang.network.PostJSON",
   //   url,
@@ -146,7 +157,7 @@ function BatchModel(keywords) {
   //   {}
   // );
 
-  // var res = keywords;
+  // let res = keywords;
   // if (response.status == 200) {
   //   if (response.data.data) {
   //     // console.log(response.data.data);

@@ -1,15 +1,17 @@
+import { FS } from "yao-node-client";
+
 /**
  * 文件复制移动逻辑
  */
-function Move(dir, name) {
+export function Move(dir: string, name: string) {
   const fs = new FS("dsl");
-  var base_dir = ".trash";
+  const base_dir = ".trash";
 
   // 判断文件夹是否存在.不存在就创建
   Mkdir(base_dir);
-  var new_dir = parseInt(Date.now() / 1000);
+  const new_dir = String(Date.now() / 1000);
   // models的文件移动到
-  var target_name = dir + "/" + name;
+  const target_name = dir + "/" + name;
 
   // 如果表已经存在,则
   if (Exists(dir, name)) {
@@ -22,15 +24,15 @@ function Move(dir, name) {
     return false;
   }
 }
-function Mkdir(name) {
+export function Mkdir(name: string) {
   const fs = new FS("dsl");
-  var res = fs.Exists(name);
+  const res = fs.Exists(name);
   if (res !== true) {
     fs.MkdirAll(name);
   }
 }
 
-function Copy(from, to, name) {
+export function Copy(from: string, to: string, name: string) {
   const fs = new FS("dsl");
   fs.Copy(from, to + "/" + name);
 }
@@ -39,9 +41,8 @@ function Copy(from, to, name) {
  * @param {*} file_name
  * @returns
  */
-function Exists(dir, file_name) {
+export function Exists(dir: string, file_name: string) {
   const fs = new FS("dsl");
-  file_name = file_name;
-  var res = fs.Exists(dir + "/" + file_name);
+  const res = fs.Exists(dir + "/" + file_name);
   return res;
 }

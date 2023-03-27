@@ -1,3 +1,7 @@
+import { YaoForm, YaoModel } from "yao-app-ts-types";
+import { Studio } from "yao-node-client";
+import { FieldColumn } from "./types";
+
 /**
  * 把hasOne变成下拉选择
  * @param {*} column
@@ -5,9 +9,13 @@
  * @param {*} component
  * @returns
  */
-function Select(column, model_dsl, component) {
+export function Select(
+  column: YaoModel.ModelColumn,
+  model_dsl: YaoModel.ModelDSL,
+  component: FieldColumn
+) {
   const props = column.props || {};
-  const title = column.label;
+  // const title = column.label;
   const name = column.name;
 
   const bind = `${name}`;
@@ -15,7 +23,7 @@ function Select(column, model_dsl, component) {
   for (var i in relation) {
     if (relation[i].type == "hasOne" && column.name == relation[i]["foreign"]) {
       var field = Studio("remote.select", i, relation[i]);
-      var component = {
+      var component: FieldColumn = {
         is_select: true,
         // bind: i + "." + field,
         bind,
@@ -46,9 +54,13 @@ function Select(column, model_dsl, component) {
   return component;
 }
 
-function EditSelect(column, model_dsl, component) {
+export function EditSelect(
+  column: YaoModel.ModelColumn,
+  model_dsl: YaoModel.ModelDSL,
+  component: FieldColumn
+) {
   const props = column.props || {};
-  const title = column.label;
+  // const title = column.label;
   const name = column.name;
   // console.log("column name:", name);
   const bind = `${name}`;
@@ -57,7 +69,7 @@ function EditSelect(column, model_dsl, component) {
   for (var i in relation) {
     if (relation[i].type == "hasOne" && column.name == relation[i]["foreign"]) {
       var field = Studio("remote.select", i, relation[i]);
-      var component = {
+      var component: FieldColumn = {
         bind: bind,
         view: { props: props, type: "Text" },
         edit: {
@@ -85,7 +97,7 @@ function EditSelect(column, model_dsl, component) {
   return component;
 }
 
-function Withs(component, relation_name) {
+function Withs(component: FieldColumn, relation_name: string) {
   // "option": { "withs": { "user": {} } }
 
   var withs = [];
@@ -99,7 +111,7 @@ function Withs(component, relation_name) {
 /**
  * 把hasMany变成列表
  */
-function Table(form_dsl, model_dsl) {
+export function Table(form_dsl: YaoForm.FormDSL, model_dsl: YaoModel.ModelDSL) {
   var relation = model_dsl.relations;
   for (var rel in relation) {
     // console.log(`translate.translate:${i}`);
@@ -119,7 +131,7 @@ function Table(form_dsl, model_dsl) {
         },
       };
       form_dsl.layout.form.sections.push({
-        title: "表格" + translate + "信息",
+        // title: "表格" + translate + "信息",
         // desc: "表格" + translate + "信息",
         columns: [{ name: "表格" + translate, width: 24 }],
       });

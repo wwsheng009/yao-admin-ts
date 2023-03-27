@@ -1,8 +1,11 @@
-import { MapAny } from "./../../../../yao-app-ts-types/src/types/dsl/share_types";
 import { Studio } from "yao-node-client";
-import { YaoComponent, YaoField, YaoTable } from "yao-app-ts-types";
-import { SchemaColumn } from "./types";
+import { YaoComponent, YaoForm, YaoModel, YaoTable } from "yao-app-ts-types";
+import { FieldColumn, FormDefinition, TableDefinition } from "./types";
 
+/**
+ * 数据库类型与控件类型对应字段
+ * @returns
+ */
 export function getType(): { [key: string]: YaoComponent.EditComponentEnum } {
   return {
     string: "Input",
@@ -31,9 +34,15 @@ export function getType(): { [key: string]: YaoComponent.EditComponentEnum } {
     enum: "Select",
   };
 }
-export function Hidden(type: number) {
+
+/**
+ * 根据参数类型返回需要排除的字段列表
+ * @param isTable true获取Table页面排除,false获取form布局排除字段
+ * @returns 排除字段列表
+ */
+export function Hidden(isTable: boolean) {
   let hidden: string[] = [];
-  if (type == 1) {
+  if (isTable) {
     // 不展示的名单列表
     hidden = [
       "secret",
@@ -67,14 +76,11 @@ export function filter() {
 }
 
 //create table from model
-export function toTable(model_dsl: {
-  table: { name: any };
-  columns: any[];
-  name: any;
-}) {
-  let table_dot_name = Studio("file.DotName", model_dsl.table.name);
-
+export function toTable(model_dsl: YaoModel.ModelDSL) {
   const columns = model_dsl.columns || [];
+
+  const table_dot_name = Studio("file.DotName", model_dsl.table.name);
+
   let tableTemplate: YaoTable.TableDSL = {
     name: model_dsl.name || "表格",
     action: {
@@ -85,9 +91,9 @@ export function toTable(model_dsl: {
     },
     layout: {
       primary: "id",
-      header: { preset: {}, actions: [] as YaoComponent.ActionDSL[] },
+      header: { preset: {}, actions: [] },
       filter: {
-        columns: [] as YaoComponent.ColumnInstances,
+        columns: [],
         actions: [
           {
             title: "添加",
@@ -106,7 +112,7 @@ export function toTable(model_dsl: {
         ],
       },
       table: {
-        columns: [] as YaoComponent.ColumnInstances,
+        columns: [],
         operation: {
           fold: false,
           actions: [
@@ -172,7 +178,7 @@ export function toTable(model_dsl: {
       table: {},
     },
   };
-  columns.forEach((column: any) => {
+  columns.forEach((column) => {
     let col = castTableColumn(column, model_dsl);
     // console.log("col:", col);
     if (col) {
@@ -206,28 +212,21 @@ export function toTable(model_dsl: {
 }
 
 export function castTableColumn(
-  column: {
-    [x: string]: string | number;
-    props?: any;
-    label?: any;
-    name?: any;
-  },
-  model_dsl: any
+  column: YaoModel.ModelColumn,
+  model_dsl: YaoModel.ModelDSL
 ) {
-  column = column || {};
-  const props = column.props || {};
+  // const props = column.props || {};
   const title = column.label || column.name;
   const name = column.name;
 
   // 不展示隐藏列
-  let hidden = Hidden(1);
+  let hidden = Hidden(true);
   if (hidden.indexOf(name) != -1) {
     console.log("castTableColumn: hidden");
     return false;
   }
-  let types = getType();
+  const typeMapping = getType();
 
-  const bind = `${name}`;
   if (!name) {
     console.log("castTableColumn: missing name");
     // log.Error("castTableColumn: missing name");
@@ -243,13 +242,18 @@ export function castTableColumn(
 
   let res = {
     layout: {
-      filter: { columns: [] as YaoComponent.ColumnInstances },
-      table: { columns: [] as YaoComponent.ColumnInstances },
+      filter: { columns: [] },
+      table: { columns: [] },
     },
-    fields: { filter: [], table: [] },
-  };
+    fields: {
+      filter: [],
+      table: [],
+    },
+  } as TableDefinition;
 
+  const bind = `${name}`;
   let component = {
+    is_select: false,
     bind: name,
     view: { type: "Text", props: {} },
     edit: {
@@ -257,7 +261,8 @@ export function castTableColumn(
       bind: bind,
       props: {},
     },
-  } as YaoField.ColumnDSL;
+  } as FieldColumn;
+
   let width = 200;
   if (title.length > 5) {
     width = 250;
@@ -265,13 +270,13 @@ export function castTableColumn(
 
   // 如果是json的,去看看是不是图片文件
   if (column["type"] == "json") {
-    let component = Studio("file.File", column, false);
+    component = Studio("file.File", column, false);
     if (!component) {
       return false;
     }
     // log.Error("castTableColumn: Type %s does not support", column.type);
   } else if (column["type"] == "enum") {
-    let component = {
+    component = {
       bind: bind,
       edit: {
         props: {
@@ -288,8 +293,8 @@ export function castTableColumn(
       width: width,
     });
   } else {
-    if (column["type"] in types) {
-      component.edit.type = types[column["type"]];
+    if (column["type"] in typeMapping) {
+      component.edit.type = typeMapping[column["type"]];
       res.layout.table.columns.push({
         name: title,
         width: width,
@@ -300,7 +305,7 @@ export function castTableColumn(
   component = Studio("selector.Select", column, model_dsl, component);
   // 如果是下拉的,则增加查询条件
   if (component.is_select) {
-    let where_bind = "where." + name + ".in";
+    const where_bind = "where." + name + ".in";
     res.fields.filter.push({
       name: title,
       component: {
@@ -309,8 +314,8 @@ export function castTableColumn(
       },
     });
   } else {
-    let filter_target = filter();
-    for (let f in filter_target) {
+    const filter_target = filter();
+    for (const f in filter_target) {
       if (name.indexOf(filter_target[f]) != -1) {
         res.fields.filter.push({
           name: title,
@@ -346,20 +351,16 @@ export function castTableColumn(
  * @param option 选择列表
  * @returns
  */
-export function Enum(option: string[]) {
+export function Enum(option: YaoModel.ColumnOption[]) {
   let res = [];
-  for (let i in option) {
+  for (const i in option) {
     res.push({ label: "::" + option[i], value: option[i] });
   }
   return res;
 }
 
-export function toForm(model_dsl: {
-  table: { name: any };
-  columns: any[];
-  name: any;
-}) {
-  let table_dot_name = Studio("file.DotName", model_dsl.table.name);
+export function toForm(model_dsl: YaoModel.ModelDSL) {
+  const table_dot_name = Studio("file.DotName", model_dsl.table.name);
 
   const actions = [
     {
@@ -436,31 +437,29 @@ export function toForm(model_dsl: {
   ];
 
   const columns = model_dsl.columns || [];
-  let tableTemplate = {
+
+  let tableTemplate: YaoForm.FormDSL = {
     name: model_dsl.name || "表单",
     action: {
       bind: {
         model: table_dot_name,
-        option: { withs: {} as MapAny },
+        option: { withs: {} },
       },
     },
     layout: {
       primary: "id",
-      operation: {
-        preset: { back: {}, save: { back: true } },
-      },
       actions,
       form: {
         props: {},
         sections: [
           {
-            columns: [] as YaoComponent.ColumnInstances,
+            columns: [],
           },
         ],
       },
     },
     fields: {
-      form: {} as MapAny,
+      form: {},
     },
   };
   /**
@@ -470,7 +469,7 @@ export function toForm(model_dsl: {
   };
    */
 
-  columns.forEach((column: any) => {
+  columns.forEach((column) => {
     let col = castFormColumn(column, model_dsl);
     if (col) {
       // col.layout.filter.columns.forEach((fc) => {});
@@ -492,38 +491,38 @@ export function toForm(model_dsl: {
   tableTemplate = Studio("selector.Table", tableTemplate, model_dsl);
   return tableTemplate;
 }
+/**根据模型定义生成Form定义 */
 export function castFormColumn(
-  column: { [x: string]: any; label?: string; name?: string },
-  model_dsl: any
+  column: YaoModel.ModelColumn,
+  model_dsl: YaoModel.ModelDSL
 ) {
-  let types = getType();
-  column = column || {};
+  const types = getType();
+
   const title = column.label || column.name;
   const name = column.name;
 
-  const bind = `${name}`;
   if (!name) {
-    //log.Error("castTableColumn: missing name");
+    //log.Error("castFormColumn: missing name");
     return false;
   }
 
   if (!title) {
-    // log.Error("castTableColumn: missing title");
+    // log.Error("castFormColumn: missing title");
     return false;
   }
 
   // 不展示隐藏列
-  let hidden = Hidden(2);
+  const hidden = Hidden(false);
   if (hidden.indexOf(name) != -1) {
     return false;
   }
 
-  let res = {
+  let res: FormDefinition = {
     layout: [],
     fields: [],
   };
 
-  let component: SchemaColumn = {
+  let component: FieldColumn = {
     bind: name,
     edit: {
       type: "Input",
@@ -531,19 +530,15 @@ export function castFormColumn(
     },
   };
 
+  const bind = `${name}`;
   if (column["type"] == "json") {
-    let component: SchemaColumn = Studio(
-      "file.FormFile",
-      column,
-      false,
-      model_dsl
-    );
+    component = Studio("file.FormFile", column, false, model_dsl);
     if (!component) {
       // log.Error("castTableColumn: Type %s does not support", column.type);
       return false;
     }
   } else if (column["type"] == "enum") {
-    let component: SchemaColumn = {
+    component = {
       bind: bind,
       edit: {
         props: {
@@ -565,7 +560,7 @@ export function castFormColumn(
   component = Studio("file.FormFile", column, component, model_dsl);
 
   if (component["is_image"]) {
-    let width = 24;
+    width = 24;
   }
   res.layout.push({
     name: title,

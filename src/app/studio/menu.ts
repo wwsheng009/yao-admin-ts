@@ -1,7 +1,10 @@
-function Create(model_dsl) {
-  var insert = [];
-  var child = [];
-  var total = model_dsl.length;
+import { FS, Process, Studio } from "yao-node-client";
+import { YaoFlow, YaoMenu } from "yao-app-ts-types";
+
+function Create(model_dsl: any[]) {
+  let insert = [] as YaoMenu.MenuItems;
+  // let child = [];
+  const total = model_dsl.length;
   insert.push({
     blocks: 0,
     icon: "icon-activity",
@@ -12,43 +15,45 @@ function Create(model_dsl) {
     visible_menu: 0,
   });
 
-  for (var i in model_dsl) {
-    var name = Studio("file.DotName", model_dsl[i]["table"]["name"]);
+  for (let i = 0; i < model_dsl.length; i++) {
+    // }
+    // for (const i in model_dsl) {
+    // const element = model_dsl[i];
+    const name = Studio("file.DotName", model_dsl[i]["table"]["name"]);
 
-    var item = {
+    let item: YaoMenu.MenuItem = {
       name: model_dsl[i].name,
       path: "/x/Table/" + name,
       icon: "",
       rank: i + 1,
       status: "enabled",
-      parent: null,
       visible_menu: 0,
+      model: model_dsl[i]["table"]["name"],
       blocks: 0,
       id: (i + 1) * 10,
-      model: name,
       children: [],
     };
     if (total >= 10) {
       item.visible_menu = 1;
       // child.push(item);
       if (i == 0) {
-        var icon = "icon-align-justify";
+        let icon = "icon-align-justify";
         item.icon = icon;
         insert[1] = item;
       } else {
         insert[1]["children"].push(item);
       }
     } else {
-      var icon = GetIcon(name);
+      const icon = GetIcon(name);
       item.icon = icon;
       insert.push(item);
     }
   }
   // Studio("move.Mkdir", "flows");
   Studio("move.Mkdir", "flows/app");
-  var fs = new FS("dsl");
+  const fs = new FS("dsl");
 
-  var dsl = {
+  const dsl: YaoFlow.Flow = {
     name: "APP Menu",
     nodes: [],
     output: {
@@ -71,10 +76,10 @@ function Create(model_dsl) {
     },
   };
 
-  var dsl = JSON.stringify(dsl);
+  const json = JSON.stringify(dsl);
   console.log(`create menu:/flows/app/menu.flow.json`);
 
-  fs.WriteFile("/flows/app/menu.flow.json", dsl);
+  fs.WriteFile("/flows/app/menu.flow.json", json);
 
   // 创建看板
   if (total >= 10) {
@@ -90,11 +95,11 @@ function Create(model_dsl) {
  * 获取菜单图标
  * @param {*} name
  */
-function GetIcon(name) {
-  var url = "https://brain.yaoapps.com/api/icon/search?name=" + name;
-  let response = Process("xiang.network.Get", url, {}, {});
-  if (response.status == 200) {
-    return response.data.data;
-  }
+function GetIcon(name: string) {
+  // let url = "https://brain.yaoapps.com/api/icon/search?name=" + name;
+  // let response = Process("xiang.network.Get", url, {}, {});
+  // if (response.status == 200) {
+  //   return response.data.data;
+  // }
   return "icon-box";
 }

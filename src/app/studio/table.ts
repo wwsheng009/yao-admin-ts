@@ -1,17 +1,21 @@
+import { YaoModel } from "yao-app-ts-types";
 //yao studio run table.Create
+
+import { FS, Studio } from "yao-node-client";
+
 /**
  * 创建表格
  */
-function Create(model_dsl) {
-  var fs = new FS("dsl");
-  for (var i in model_dsl) {
+export function Create(model_dsl: YaoModel.ModelDSL[]) {
+  let fs = new FS("dsl");
+  for (const i in model_dsl) {
     let table_name = Studio("file.SlashName", model_dsl[i]["table"]["name"]);
 
-    var table_file_name = table_name + ".tab.json";
-    //var dsl = toTable(model_dsl[i]);
+    let table_file_name = table_name + ".tab.json";
+    //let dsl = toTable(model_dsl[i]);
 
-    var dsl = Studio("colunm.toTable", model_dsl[i]); //这里有studio js读取操作
-    var table = JSON.stringify(dsl);
+    let dsl = Studio("colunm.toTable", model_dsl[i]); //这里有studio js读取操作
+    let table = JSON.stringify(dsl);
     // console.log(dsl);
 
     //如果在这个位置调用写文件操作会导致js脚本重加载。
@@ -21,9 +25,9 @@ function Create(model_dsl) {
     //里触发：yao.loadReader(yao.rootScripts, true, reader, name, filename...)
     //yao.rootScripts被清空
     ///
-    var form_flie_name = table_name + ".form.json";
-    var form_dsl = Studio("colunm.toForm", model_dsl[i]); //这里有studio js读取操作
-    var form = JSON.stringify(form_dsl);
+    let form_flie_name = table_name + ".form.json";
+    let form_dsl = Studio("colunm.toForm", model_dsl[i]); //这里有studio js读取操作
+    let form = JSON.stringify(form_dsl);
     Studio("move.Move", "forms", form_flie_name);
     console.log(`create form:/forms/"${table_file_name}.mod.json`);
 

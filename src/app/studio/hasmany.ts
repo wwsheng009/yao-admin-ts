@@ -1,5 +1,12 @@
-function hasMany(table_name, field_name, all_table) {
-  var relation = [
+import { YaoModel } from "yao-app-ts-types";
+import { Studio } from "yao-node-client";
+
+export function hasMany(
+  table_name: string,
+  field_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
+  const relation = [
     "hasMany_id",
     "hasMany_ID",
     "hasMany_Id",
@@ -7,7 +14,7 @@ function hasMany(table_name, field_name, all_table) {
     "PerfixhasMany_ID",
     "PerfixhasMany_Id",
   ];
-  for (var i in relation) {
+  for (const i in relation) {
     all_table = Studio(
       "hasmany." + relation[i],
       table_name,
@@ -17,14 +24,18 @@ function hasMany(table_name, field_name, all_table) {
   }
   return all_table;
 }
-function hasMany_id(table_name, field_name, all_table) {
+export function hasMany_id(
+  table_name: string,
+  field_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
   if (field_name.indexOf("_id") != -1) {
     const model_name = Studio("file.DotName", table_name);
 
-    for (var i in all_table) {
-      var target = field_name.replace("_id", "");
+    for (const i in all_table) {
+      const target = field_name.replace("_id", "");
 
       if (target == all_table[i]["table"]["name"]) {
         all_table[i]["relations"][table_name] = {
@@ -39,14 +50,18 @@ function hasMany_id(table_name, field_name, all_table) {
   }
   return all_table;
 }
-function hasMany_ID(table_name, field_name, all_table) {
+export function hasMany_ID(
+  table_name: string,
+  field_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
   if (field_name.indexOf("ID") != -1) {
     const model_name = Studio("file.DotName", table_name);
 
-    for (var i in all_table) {
-      var target = field_name.replace("ID", "");
+    for (const i in all_table) {
+      const target = field_name.replace("ID", "");
 
       if (target == all_table[i]["table"]["name"]) {
         all_table[i]["relations"][table_name] = {
@@ -61,14 +76,18 @@ function hasMany_ID(table_name, field_name, all_table) {
   }
   return all_table;
 }
-function hasMany_Id(table_name, field_name, all_table) {
+export function hasMany_Id(
+  table_name: string,
+  field_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
   if (field_name.indexOf("Id") != -1) {
     const model_name = Studio("file.DotName", table_name);
 
-    for (var i in all_table) {
-      var target = field_name.replace("Id", "");
+    for (const i in all_table) {
+      const target = field_name.replace("Id", "");
 
       if (target == all_table[i]["table"]["name"]) {
         all_table[i]["relations"][table_name] = {
@@ -83,17 +102,21 @@ function hasMany_Id(table_name, field_name, all_table) {
   }
   return all_table;
 }
-function PerfixhasMany_id(table_name, field_name, all_table) {
+export function PerfixhasMany_id(
+  table_name: string,
+  field_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
 
   if (field_name.indexOf("_id") != -1) {
-    var prefix = Studio("schema.TablePrefix");
+    const prefix = Studio("schema.TablePrefix");
     const model_name = Studio("file.DotName", table_name);
 
-    for (var i in all_table) {
-      for (var j in prefix) {
-        var target = prefix[j] + "_" + field_name.replace("_id", "");
+    for (const i in all_table) {
+      for (const j in prefix) {
+        const target = prefix[j] + "_" + field_name.replace("_id", "");
         if (target == all_table[i]["table"]["name"]) {
           all_table[i]["relations"][table_name] = {
             type: "hasMany",
@@ -109,17 +132,21 @@ function PerfixhasMany_id(table_name, field_name, all_table) {
   return all_table;
 }
 
-function PerfixhasMany_ID(table_name, field_name, all_table) {
+export function PerfixhasMany_ID(
+  table_name: string,
+  field_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
 
   if (field_name.indexOf("ID") != -1) {
-    var prefix = Studio("schema.TablePrefix");
+    const prefix = Studio("schema.TablePrefix");
     const model_name = Studio("file.DotName", table_name);
 
-    for (var i in all_table) {
-      for (var j in prefix) {
-        var target = prefix[j] + "_" + field_name.replace("ID", "");
+    for (const i in all_table) {
+      for (const j in prefix) {
+        const target = prefix[j] + "_" + field_name.replace("ID", "");
         if (target == all_table[i]["table"]["name"]) {
           all_table[i]["relations"][table_name] = {
             type: "hasMany",
@@ -134,17 +161,21 @@ function PerfixhasMany_ID(table_name, field_name, all_table) {
   }
   return all_table;
 }
-function PerfixhasMany_Id(table_name, field_name, all_table) {
+export function PerfixhasMany_Id(
+  table_name: string,
+  field_name: string,
+  all_table: YaoModel.ModelDSL[]
+) {
   // 判断hasMany
   // 如果包含下划线+id,说明他有可能是别的表的外键
 
   if (field_name.indexOf("Id") != -1) {
-    var prefix = Studio("schema.TablePrefix");
+    const prefix = Studio("schema.TablePrefix");
     const model_name = Studio("file.DotName", table_name);
 
-    for (var i in all_table) {
-      for (var j in prefix) {
-        var target = prefix[j] + "_" + field_name.replace("Id", "");
+    for (const i in all_table) {
+      for (const j in prefix) {
+        const target = prefix[j] + "_" + field_name.replace("Id", "");
         if (target == all_table[i]["table"]["name"]) {
           all_table[i]["relations"][table_name] = {
             type: "hasMany",

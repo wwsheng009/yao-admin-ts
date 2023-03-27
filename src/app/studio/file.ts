@@ -1,11 +1,12 @@
-import { MapAny, YaoComponent, YaoField } from "yao-app-ts-types";
+import { MapAny, YaoComponent, YaoField, YaoModel } from "yao-app-ts-types";
 import { FS } from "yao-node-client";
-import { SchemaColumn } from "./types";
-// 图片组件推测
+import { FieldColumn } from "./types";
+
+// 根据图片组件更新组件类型,只查看
 export function File(
-  column: MapAny,
-  component: YaoField.ColumnDSL
-): YaoField.ColumnDSL {
+  column: YaoModel.ModelColumn,
+  component: FieldColumn
+): FieldColumn {
   var guard = [
     "img",
     "image",
@@ -26,7 +27,7 @@ export function File(
   const name = column.name;
   for (var i in guard) {
     if (name.indexOf(guard[i]) != -1) {
-      var component: YaoField.ColumnDSL = {
+      var component: FieldColumn = {
         bind: name,
         view: {
           type: "Image",
@@ -52,11 +53,18 @@ export function File(
   return component;
 }
 
+/**
+ * 根据图片组件更新组件类型,可上传
+ * @param column 模型中的字段定义
+ * @param component 数据库字段定义
+ * @param model_dsl 模型引用
+ * @returns
+ */
 export function FormFile(
-  column: { name: string },
-  component: YaoField.ColumnDSL & MapAny,
-  model_dsl: MapAny
-): SchemaColumn {
+  column: YaoModel.ModelColumn,
+  component: FieldColumn,
+  model_dsl: YaoModel.ModelDSL
+): FieldColumn {
   var guard = [
     "img",
     "image",
@@ -77,7 +85,7 @@ export function FormFile(
   const name = column.name;
   for (var i in guard) {
     if (name.indexOf(guard[i]) != -1) {
-      var component: SchemaColumn = {
+      var component: FieldColumn = {
         is_image: true,
         bind: name,
         view: {
@@ -89,7 +97,7 @@ export function FormFile(
           type: "Upload",
           compute: {
             process: "scripts.file.image.ImagesEdit",
-            args: ["$C(row)", "$C(type)", name, model_dsl["table"]["name"]],
+            args: ["$C(row)", "$C(type)", name, model_dsl.table.name],
           },
           // compute: "scripts.file.image.ImagesEdit",
           props: {

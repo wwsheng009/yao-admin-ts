@@ -5,7 +5,7 @@ import { FS, Studio } from "yao-node-client";
 /**
  * 创建模型
  */
-function Create() {
+export function Create() {
   console.log(Date.now() / 1000);
   const model_dsl = CreateModels();
   console.log(Date.now() / 1000);
@@ -22,13 +22,13 @@ function Create() {
  * yao studio run model.CreateModels
  * @returns
  */
-function CreateModels() {
-  var model_dsl = Studio("schema.Relation");
-  var fs = new FS("dsl");
-  for (var i in model_dsl) {
+export function CreateModels() {
+  const model_dsl = Studio("schema.Relation");
+  const fs = new FS("dsl");
+  for (const i in model_dsl) {
     let table_name = Studio("file.SlashName", model_dsl[i]["table"]["name"]);
-    var table_file_name = table_name + ".mod.json";
-    var table = JSON.stringify(model_dsl[i]);
+    const table_file_name = table_name + ".mod.json";
+    const table = JSON.stringify(model_dsl[i]);
     Studio("move.Move", "models", table_file_name);
     console.log(`create model:/models/"${table_file_name}.mod.json`);
     fs.WriteFile("/models/" + table_file_name, table);
@@ -37,18 +37,18 @@ function CreateModels() {
 }
 //创建单个表格的studio
 ///yao studio run model.CreateOne address
-function CreateOne(model_name: string) {
+export function CreateOne(model_name: string) {
   let model_file_name = Studio("file.SlashName", model_name);
   console.log("进入studio");
   // console.log(model_name);
-  var fs = new FS("dsl");
-  var model_dsl = [];
+  const fs = new FS("dsl");
+  let model_dsl = [];
 
   model_dsl.push(
     JSON.parse(fs.ReadFile("models/" + model_file_name + ".mod.json"))
   );
 
-  // for (var i in model_dsl) {
+  // for (const i in model_dsl) {
   //   let model_name = Studio("file.SlashName", model_dsl[i]["table"]["name"]);
   //   let model_file_name = model_name + ".mod.json";
   //   let model = JSON.stringify(model_dsl[i]);
@@ -65,8 +65,8 @@ function CreateOne(model_name: string) {
 /**
  * 写入10.3版本的
  */
-function version10_0_3() {
-  var fs = new FS("dsl");
+export function version10_0_3() {
+  const fs = new FS("dsl");
 
   fs.WriteFile(
     "app.json",
@@ -89,13 +89,13 @@ function version10_0_3() {
     })
   );
 }
-function login() {
-  var fs = new FS("dsl");
-  // var menu = Process("models.xiang.menu.get", {
+export function login() {
+  const fs = new FS("dsl");
+  // const menu = Process("models.xiang.menu.get", {
   //   limit: 1,
   // });
-  var table_name = "admin.login.json";
-  var table = JSON.stringify({
+  const table_name = "admin.login.json";
+  const table = JSON.stringify({
     name: "::Admin Login",
     action: {
       process: "yao.login.Admin",
