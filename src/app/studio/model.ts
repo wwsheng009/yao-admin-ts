@@ -82,7 +82,7 @@ export function version10_0_3() {
         args: ["demo"],
       },
       setup: "studio.model.Create",
-      adminRoot: "yao",
+      adminRoot: "admin",
       optional: {
         hideNotification: true,
         hideSetting: false,

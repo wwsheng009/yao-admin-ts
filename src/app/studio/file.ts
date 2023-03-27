@@ -1,5 +1,5 @@
 import { MapAny, YaoComponent, YaoField, YaoModel } from "yao-app-ts-types";
-import { FS } from "yao-node-client";
+import { FS, Studio } from "yao-node-client";
 import { FieldColumn } from "./types";
 
 // 根据图片组件更新组件类型,只查看
@@ -100,7 +100,6 @@ export function FormFile(
             process: "scripts.file.image.ImagesEdit",
             args: ["$C(row)", "$C(type)", name, model_dsl.table.name],
           },
-          // compute: "scripts.file.image.ImagesEdit",
           props: {
             filetype: "image",
             $api: { process: "fs.system.Upload" },
@@ -130,7 +129,6 @@ export function DotName(pathname: string) {
   let newStr = str.replace(/^\.+|\.+$/g, "");
   return newStr;
 }
-
 /**
  * yao studio run file.SlashName crm_help
  * @param {string} pathname
@@ -154,21 +152,32 @@ export function SlashName(pathname: string) {
  * @returns new filename
  */
 export function FileNameConvert(filename: string) {
-  let str = filename;
-  str = str.replace(/_/g, "/");
-  str = str.replace(/-/g, "/");
-  str = str.replace(/\\/g, "/");
-  str = str.replace(/\/\//g, "/");
-  let arr = str.split(".");
+  const str = filename.replace(/[\\_-]/g, "/");
+  const arr = str.split(".");
   if (arr.length < 3) {
     return str;
   }
-  let suffix = arr.slice(-2);
-  let header = arr.slice(0, -2);
-  let str1 = header.join("/");
-  str1 = str1 + "." + suffix.join(".");
-  return str1;
+  const suffix = arr.slice(-2);
+  const header = arr.slice(0, -2);
+  const str1 = header.join("/") + "." + suffix.join(".");
+  return str1.replace(/\/\//g, "/");
 }
+// export function FileNameConvert(filename: string) {
+//   let str = filename;
+//   str = str.replace(/_/g, "/");
+//   str = str.replace(/-/g, "/");
+//   str = str.replace(/\\/g, "/");
+//   str = str.replace(/\/\//g, "/");
+//   let arr = str.split(".");
+//   if (arr.length < 3) {
+//     return str;
+//   }
+//   let suffix = arr.slice(-2);
+//   let header = arr.slice(0, -2);
+//   let str1 = header.join("/");
+//   str1 = str1 + "." + suffix.join(".");
+//   return str1;
+// }
 /**
  * write file
  * yao studio run file.WriteFile "/models/cms_help.mod.json"
@@ -178,19 +187,32 @@ export function FileNameConvert(filename: string) {
  * @param {object} data
  */
 export function WriteFile(filename: string, data: object) {
-  let nfilename = FileNameConvert(filename);
+  const fs = new FS("dsl");
+  const nfilename = FileNameConvert(filename);
 
-  let fs = new FS("dsl");
   if (!fs.Exists(nfilename)) {
-    let paths = nfilename.split("/");
-    paths.pop();
-    let folder = paths.join("/");
-
+    const folder = nfilename.split("/").slice(0, -1).join("/");
     if (!fs.Exists(folder)) {
-      // console.log("make folder", folder);
       fs.MkdirAll(folder);
     }
   }
-  // console.log("write file:", nfilename);
+
   fs.WriteFile(filename, JSON.stringify(data));
 }
+// export function WriteFile(filename: string, data: object) {
+//   let nfilename = FileNameConvert(filename);
+
+//   let fs = new FS("dsl");
+//   if (!fs.Exists(nfilename)) {
+//     let paths = nfilename.split("/");
+//     paths.pop();
+//     let folder = paths.join("/");
+
+//     if (!fs.Exists(folder)) {
+//       // console.log("make folder", folder);
+//       fs.MkdirAll(folder);
+//     }
+//   }
+//   // console.log("write file:", nfilename);
+//   fs.WriteFile(filename, JSON.stringify(data));
+// }

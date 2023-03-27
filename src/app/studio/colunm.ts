@@ -337,13 +337,13 @@ export function castTableColumn(
       }
     }
   }
-  delete component.is_select;
   component = Studio("file.File", column, component);
 
   // component.edit = { type: "input", props: { value: bind } };
   // res.list.columns.push({ name: title });
   // res.edit.push({ name: title, width: 24 });
   // break;
+  delete component.is_select;
 
   res.fields.table.push({
     name: title,
@@ -380,6 +380,14 @@ export function toForm(model_dsl: YaoModel.ModelDSL) {
           name: "StudioModel",
           type: "Studio.model",
           payload: { method: "CreateOne", args: [table_dot_name] },
+        },
+        {
+          name: "Confirm",
+          type: "Common.confirm",
+          payload: {
+            title: "提示",
+            content: "处理完成",
+          },
         },
       ],
     },
@@ -577,6 +585,7 @@ export function castFormColumn(
   // res.list.columns.push({ name: title });
   // res.edit.push({ name: title, width: 24 });
   // break;
+  delete component["is_image"];
 
   res.fields.push({
     name: title,

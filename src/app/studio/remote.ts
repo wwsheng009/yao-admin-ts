@@ -20,10 +20,10 @@ export function select(relation_name: any, relation: { model: any }) {
  * @param {*} column
  * @returns
  */
-export function Speculation(column: YaoModel.ModelColumn[]) {
+export function Speculation(columns: YaoModel.ModelColumn[]) {
   const target = ["name", "title"];
-  for (const i in target) {
-    const res = GetTarget(target[i], column);
+  for (const t of target) {
+    const res = GetTarget(t, columns);
     if (res) {
       return res;
     }
@@ -31,10 +31,10 @@ export function Speculation(column: YaoModel.ModelColumn[]) {
   return false;
 }
 
-export function GetTarget(target: string, column: YaoModel.ModelColumn[]) {
-  for (const i in column) {
-    if (column[i].name.indexOf(target) != -1) {
-      return column[i].name;
+export function GetTarget(target: string, columns: YaoModel.ModelColumn[]) {
+  for (const column of columns) {
+    if (column.name.includes(target)) {
+      return column.name;
     }
   }
   return false;

@@ -10,27 +10,24 @@ const children = ["children", "children_id", "child", "child_id"];
  * @param {*} table_struct
  */
 export function child(
-  model_name: string,
+  modelName: string,
   columns: YaoModel.ModelColumn[],
-  table_struct: YaoModel.ModelDSL
-) {
-  const dotName = Studio("file.DotName", model_name);
-  for (const i in columns) {
-    if (columns[i]["type"] != "integer") {
-      continue;
-    }
-    if (children.indexOf(columns[i]["name"]) != -1) {
-      table_struct.relations.children = {
-        type: "hasMany",
-        model: dotName,
-        key: columns[i]["name"],
-        foreign: "id",
-        query: {},
-      };
-      return table_struct;
-    }
+  tableStruct: YaoModel.ModelDSL
+): YaoModel.ModelDSL {
+  const dotName = Studio("file.DotName", modelName);
+  const childColumns = columns.filter(
+    (column) => column.type === "integer" && children.includes(column.name)
+  );
+  if (childColumns.length > 0) {
+    tableStruct.relations.children = {
+      type: "hasMany",
+      model: dotName,
+      key: childColumns[0].name,
+      foreign: "id",
+      query: {},
+    };
   }
-  return table_struct;
+  return tableStruct;
 }
 
 /**
@@ -40,51 +37,39 @@ export function child(
  * @param {*} table_struct
  * @returns
  */
+
 export function parent(
   model_name: string,
   columns: YaoModel.ModelColumn[],
   table_struct: YaoModel.ModelDSL
 ) {
   const dotName = Studio("file.DotName", model_name);
-  for (let i in columns) {
-    if (columns[i]["type"] != "integer") {
-      continue;
-    }
-    if (parents.indexOf(columns[i]["name"]) != -1) {
-      table_struct.relations.parent = {
-        type: "hasOne",
-        model: dotName,
-        key: "id",
-        foreign: columns[i]["name"],
-        query: {},
-      };
-      return table_struct;
-    }
+  const parentColumn = columns.find(
+    (column) => column.type === "integer" && parents.includes(column.name)
+  );
+  if (parentColumn) {
+    table_struct.relations.parent = {
+      type: "hasOne",
+      model: dotName,
+      key: "id",
+      foreign: parentColumn.name,
+      query: {},
+    };
   }
   return table_struct;
 }
 
 export function other(all_table_struct: YaoModel.ModelDSL[]) {
-  for (const i in all_table_struct) {
-    // console.log(
-    //   `process table Relation:${all_table_struct[i]["table"]["name"]}`
-    // );
-
-    const temp = all_table_struct[i]["columns"];
-    all_table_struct = Studio(
-      "hasone.hasOne",
-      all_table_struct[i]["table"]["name"],
-      all_table_struct
-    );
-    for (const j in temp) {
-      all_table_struct = Studio(
-        "hasmany.hasMany",
-        all_table_struct[i]["table"]["name"],
-        temp[j].name,
+  for (const table of all_table_struct) {
+    const columns = table.columns;
+    all_table_struct = hasOne(table.table.name, all_table_struct);
+    for (const column of columns) {
+      all_table_struct = hasMany(
+        table.table.name,
+        column.name,
         all_table_struct
       );
     }
-    //console.log("debugger:===>done", all_table_struct[i]["table"]["name"]);
   }
   return all_table_struct;
 }
@@ -167,4 +152,66 @@ export function BatchModel(keywords: string) {
   //   }
   // }
   // return res;
+}
+
+export function hasOne(
+  table_name: string,
+  all_table: YaoModel.ModelDSL[]
+): YaoModel.ModelDSL[] {
+  const foreignIds = [`${table_name}_id`, `${table_name}ID`, `${table_name}Id`];
+  const prefix: string[] = Studio("schema.TablePrefix");
+  if (prefix.length) {
+    foreignIds.push(`${Studio("schema.ReplacePrefix", prefix, table_name)}_id`);
+    foreignIds.push(`${Studio("schema.ReplacePrefix", prefix, table_name)}ID`);
+    foreignIds.push(`${Studio("schema.ReplacePrefix", prefix, table_name)}Id`);
+  }
+  const dotName: string = Studio("file.DotName", table_name);
+  return all_table.map((table) => {
+    table.columns.forEach((column) => {
+      if (foreignIds.includes(column.name)) {
+        table.relations[table_name] = {
+          type: "hasOne",
+          model: dotName,
+          key: "id",
+          foreign: column.name,
+          query: {},
+        };
+      }
+    });
+    return table;
+  });
+}
+
+export function hasMany(
+  tableName: string,
+  fieldName: string,
+  allTables: YaoModel.ModelDSL[]
+) {
+  const relationSuffixes = ["_id", "_ID", "_Id"];
+  const tablePrefixes: string[] = Studio("schema.TablePrefix");
+  const dotName = Studio("file.DotName", tableName);
+
+  for (const suffix of relationSuffixes) {
+    for (const table of allTables) {
+      if (fieldName.endsWith(suffix)) {
+        const target = fieldName.replace(suffix, "");
+        if (
+          target === table.table.name ||
+          tablePrefixes.some(
+            (prefix) => `${prefix}_${target}` === table.table.name
+          )
+        ) {
+          table.relations[tableName] = {
+            type: "hasMany",
+            model: dotName,
+            key: fieldName,
+            foreign: "id",
+            query: {},
+          };
+        }
+      }
+    }
+  }
+
+  return allTables;
 }
