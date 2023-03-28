@@ -1,5 +1,6 @@
 //yao studio run model.Create
 
+import { YaoModel } from "yao-app-ts-types";
 import { FS, Studio } from "yao-node-client";
 
 /**
@@ -25,7 +26,7 @@ export function Create() {
  * @returns
  */
 export function CreateModels() {
-  const model_dsl = Studio("schema.Relation");
+  const model_dsl: YaoModel.ModelDSL[] = Studio("schema.Relation");
   const fs = new FS("dsl");
   for (const i in model_dsl) {
     let table_name = Studio("file.SlashName", model_dsl[i]["table"]["name"]);

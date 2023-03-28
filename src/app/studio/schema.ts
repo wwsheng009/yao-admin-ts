@@ -1,6 +1,8 @@
 import { YaoModel } from "yao-app-ts-types";
 import { Exception, log, Process, Studio } from "yao-node-client";
 
+let AllTables: string[] = [];
+
 /**yao studio run schema.GetTable role
  * 获取单个表字段
  * @param {*} name
@@ -13,7 +15,12 @@ export function GetTable(name: string): YaoModel.ModelDSL {
  * 获取所有表格名称
  */
 export function GetTableName(): string[] {
-  return Process("schemas.default.Tables");
+  if (AllTables.length) {
+    return AllTables;
+  } else {
+    AllTables = Process("schemas.default.Tables");
+  }
+  return AllTables;
 }
 
 /**
@@ -21,7 +28,7 @@ export function GetTableName(): string[] {
  * @param {*} type
  * yao studio run schema.Relation
  */
-export function Relation() {
+export function Relation(): YaoModel.ModelDSL[] {
   let all_table = GetTableName();
   let table_num = all_table.length;
   if (table_num > 80) {
@@ -42,13 +49,13 @@ export function Relation() {
       continue;
     }
     //console.log(`process table Relation:${all_table[i]}`);
-    const col = GetTable(all_table[i]);
-    //col.columns = Studio("relation.BatchTranslate", col.columns);
+    const table = GetTable(all_table[i]);
+    // col.columns = Studio("relation.BatchTranslate", col.columns);
     // console.log(col.columns);
     // return;
 
     let id_flag = false;
-    for (const column of col.columns) {
+    for (const column of table.columns) {
       const name = column.name.toLowerCase();
 
       if (name === "id") {
@@ -82,21 +89,20 @@ export function Relation() {
     // 去除表前缀
     let trans = ReplacePrefix(prefix, all_table[i]);
 
-    col.name = trans;
-    //col.name = Studio("relation.translate", trans);
-    col.decription = col.name;
-    col.table = {};
-    col.table.name = all_table[i];
+    table.name = Studio("relation.translate", trans);
+    table.decription = table.name;
+    table.table = {};
+    table.table.name = all_table[i];
     // console.log("col.table.name", col.table.name);
-    col.table.comment = col.name;
-    col.relations = {};
+    table.table.comment = table.name;
+    table.relations = {};
     let parent: YaoModel.ModelDSL = Studio(
       "relation.parent",
       all_table[i],
-      col.columns,
-      col
+      table.columns,
+      table
     );
-    parent = Studio("relation.child", all_table[i], col.columns, parent);
+    parent = Studio("relation.child", all_table[i], table.columns, parent);
 
     table_arr.push(parent);
   }
@@ -104,7 +110,7 @@ export function Relation() {
   table_arr = Studio("relation.other", table_arr);
   // console.log("debugger:===>relation.BatchModel");
 
-  // table_arr = Studio("relation.BatchModel", table_arr);
+  table_arr = Studio("relation.BatchModel", table_arr);
   // console.log("debugger:===>relation.BatchModel down");
 
   return table_arr;

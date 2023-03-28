@@ -1,5 +1,5 @@
 import { YaoModel } from "yao-app-ts-types";
-import { Studio } from "yao-node-client";
+import { Process, Studio } from "yao-node-client";
 
 const parents = ["parent", "parent_id", "pid"];
 const children = ["children", "children_id", "child", "child_id"];
@@ -74,31 +74,33 @@ export function other(all_table_struct: YaoModel.ModelDSL[]) {
   return all_table_struct;
 }
 
-// yao studio run relation.translate icon
-export function translate(keywords: string) {
-  if (keywords == "id" || keywords == "ID") {
+// yao studio run relation.translate member_id
+export function translate(keywordsIn: string) {
+  if (keywordsIn.includes("_id")) {
+    console.log(`id_colume:${keywordsIn}`);
+  }
+  if (keywordsIn == "id" || keywordsIn == "ID") {
     return "id";
   }
-  // let keywords = keywords.split("_");
-  //console.log(keywords);
-  // let url = "https://brain.yaoapps.com/api/keyword/column";
-  // let response = Process(
-  //   "xiang.network.PostJSON",
-  //   url,
-  //   {
-  //     keyword: keywords,
-  //   },
-  //   {}
-  // );
-  let res = keywords;
-  // if (response.status == 200) {
-  //   if (response.data.data) {
-  //     let res = "";
-  //     for (let i in response.data.data) {
-  //       let res = res + response.data.data[i]["label"];
-  //     }
-  //   }
-  // }
+  let keywords = keywordsIn.split("_");
+  let url = "https://brain.yaoapps.com/api/keyword/column";
+  let response = Process(
+    "xiang.network.PostJSON",
+    url,
+    {
+      keyword: keywords,
+    },
+    {}
+  );
+  let res = keywordsIn;
+  if (response.status == 200) {
+    if (response.data.data) {
+      res = "";
+      for (let i in response.data.data) {
+        res = res + response.data.data[i]["label"];
+      }
+    }
+  }
   return res;
 }
 
@@ -108,50 +110,47 @@ export function translate(keywords: string) {
  * @returns
  */
 export function BatchTranslate(keywords: string) {
+  // return keywords;
+  let url = "https://brain.yaoapps.com/api/keyword/batch_column";
+  let response = Process(
+    "xiang.network.PostJSON",
+    url,
+    {
+      keyword: keywords,
+    },
+    {}
+  );
+  if (response.status == 200) {
+    if (response.data.data) {
+      // console.log(response.data.data);
+      return response.data.data;
+    }
+  }
   return keywords;
-  // let url = "https://brain.yaoapps.com/api/keyword/batch_column";
-  // let response = Process(
-  //   "xiang.network.PostJSON",
-  //   url,
-  //   {
-  //     keyword: keywords,
-  //   },
-  //   {}
-  // );
-  // let res = keywords;
-  // if (response.status == 200) {
-  //   if (response.data.data) {
-  //     // console.log(response.data.data);
-  //     return response.data.data;
-  //   }
-  // }
-  // return res;
 }
 /**
  * Model dsl全部翻译翻译
  * @param {*} keywords
  * @returns
  */
-export function BatchModel(keywords: string) {
-  return keywords;
-  // let url = "https://brain.yaoapps.com/api/keyword/batch_model";
-  // let response = Process(
-  //   "xiang.network.PostJSON",
-  //   url,
-  //   {
-  //     keyword: keywords,
-  //   },
-  //   {}
-  // );
+export function BatchModel(keywords: YaoModel.ModelDSL[]): YaoModel.ModelDSL[] {
+  let url = "https://brain.yaoapps.com/api/keyword/batch_model";
+  let response = Process(
+    "xiang.network.PostJSON",
+    url,
+    {
+      keyword: keywords,
+    },
+    {}
+  );
 
-  // let res = keywords;
-  // if (response.status == 200) {
-  //   if (response.data.data) {
-  //     // console.log(response.data.data);
-  //     return response.data.data;
-  //   }
-  // }
-  // return res;
+  if (response.status == 200) {
+    if (response.data.data) {
+      // console.log(response.data.data);
+      return response.data.data;
+    }
+  }
+  return keywords;
 }
 
 export function hasOne(
