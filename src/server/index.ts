@@ -1,3 +1,3 @@
-import Startup from "yao-node-server";
+import { startup } from "yao-node-server";
 
-Startup();
+startup();

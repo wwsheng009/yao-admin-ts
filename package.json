@@ -6,7 +6,6 @@
   "scripts": {
     "dev:node:comment": "使用配置文件nodemon.json",
     "start": "nodemon ./src/server/index.ts",
-    "dev": "nodemon --watch 'src/app/**/*.ts' --watch '../yao-node-app/apis/*.json' --exec 'ts-node' -r tsconfig-paths/register ./src/server/index.ts",
     "run": "pnpm run build  && ts-node -r tsconfig-paths/register ./src/server/index.ts",
     "build": "rimraf dist && tsc && tsc-alias",
     "build:watch": "concurrently --kill-others \"tsc -w\" \"tsc-alias -w\"",
@@ -14,13 +13,6 @@
     "yao:fixed-ts": "tsx src/tools/clean_up.ts -d ./dist_esm/app",
     "yao:build-fix": "pnpm run yao:build && pnpm run yao:fixed-ts",
     "comment": ">>>>>>>>>----------<<<<<<<<<<<<<",
-    "rollup:comp": "rollup -c rollup.config.mjs -i dist_esm/app/scripts/rollup/index.js -o dist_esm/app/scripts/rollup/index.bound.js",
-    "yao:rollup": "rimraf yao && rollup -c rollup.config.mjs",
-    "yao:fixed": "tsx src/tools/clean_up.ts -d ./yao/app",
-    "yao:pack": "pnpm run yao:rollup && pnpm run yao:fixed",
-    "yao:fixed:jsproxy": "ts-node -r tsconfig-paths/register src/tools/clean_up.ts -f ./dist_esm/app/scripts/jsproxy.js",
-    "yao:compile:jsproxy": "pnpm run yao:build && pnpm run yao:fixed:jsproxy",
-    "comment->test": "test",
     "test": "pnpm run build && node dist/debugger/index.js",
     "debug": "pnpm run build && tsx src/debugger/index.ts"
   },
@@ -33,7 +25,7 @@
   "dependencies": {
     "yao-app-ts-types": "^1.0.0",
     "yao-node-client": "^1.0.2",
-    "yao-node-server": "1.0.0",
+    "yao-node-server": "^1.0.0",
     "yargs": "^17.7.1"
   },
   "devDependencies": {
