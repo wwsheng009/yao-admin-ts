@@ -9,7 +9,7 @@ export function Move(dir: string, name: string) {
 
   // 判断文件夹是否存在.不存在就创建
   Mkdir(base_dir);
-  const new_dir = String(Date.now() / 1000);
+  const new_dir = Math.floor(Date.now() / 1000);
   // models的文件移动到
   const target_name = dir + "/" + name;
 

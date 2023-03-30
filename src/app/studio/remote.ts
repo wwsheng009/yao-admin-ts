@@ -31,27 +31,21 @@ export function Speculation(columns: YaoModel.ModelColumn[]) {
   return false;
 }
 
-export function GetTarget(target: string, columns: YaoModel.ModelColumn[]) {
-  for (const column of columns) {
-    if (column.name.includes(target)) {
-      return column.name;
-    }
-  }
-  return false;
+export function GetTarget(
+  target: string,
+  columns: YaoModel.ModelColumn[]
+): string | false {
+  const columnNames = columns.map((col) => col.name);
+  return columnNames.find((name) => name.includes(target)) ?? false;
 }
-
 /**
  * 没有其他的话,就找个string类型的
  * @param {*} columns
  * @returns
  */
-export function Other(columns: YaoModel.ModelColumn[]) {
-  for (const i in columns) {
-    if (columns[i].type == "string") {
-      return columns[i].name;
-    }
-  }
-  return "id";
+export function Other(columns: YaoModel.ModelColumn[]): string {
+  const stringColumn = columns.find((col) => col.type === "string");
+  return stringColumn?.name ?? "id";
 }
 
 /**

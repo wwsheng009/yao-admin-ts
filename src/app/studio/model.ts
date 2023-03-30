@@ -4,7 +4,7 @@ import { YaoModel } from "yao-app-ts-types";
 import { FS, Studio } from "yao-node-client";
 
 /**
- * 创建模型
+ * 从数据结构中创建模型
  */
 export function Create() {
   const start = Math.floor(Date.now() / 1000);
@@ -38,6 +38,32 @@ export function CreateModels() {
   }
   return model_dsl;
 }
+
+function getAllModelsFromFile(): string[] {
+  const fs = new FS("dsl");
+  const files = fs.ReadDir("models/", true);
+
+  return files
+    .filter((file) => !fs.IsDir(file) && file.endsWith(".mod.json"))
+    .map((file) => file.replace("/models/", ""));
+}
+/**
+ * 根据本地的模型文件创建表格与表单配置
+ */
+export function CreateFromModelFiles() {
+  const files = getAllModelsFromFile();
+  const fs = new FS("dsl");
+  const model_dsl = files.map((file) => {
+    return JSON.parse(fs.ReadFile("models/" + file));
+  });
+
+  // 创建表格与表单dsl
+  Studio("table.Create", model_dsl);
+
+  // 创建菜单
+  Studio("menu.Create", model_dsl);
+}
+
 //创建单个表格的studio
 ///yao studio run model.CreateOne address
 export function CreateOne(model_name: string) {
@@ -49,14 +75,6 @@ export function CreateOne(model_name: string) {
   model_dsl.push(
     JSON.parse(fs.ReadFile("models/" + model_file_name + ".mod.json"))
   );
-
-  // for (const i in model_dsl) {
-  //   let model_name = Studio("file.SlashName", model_dsl[i]["table"]["name"]);
-  //   let model_file_name = model_name + ".mod.json";
-  //   let model = JSON.stringify(model_dsl[i]);
-  //   Studio("move.Move", "models", model_file_name);
-  //   fs.WriteFile("/models/" + model_file_name, model);
-  // }
 
   // 创建表格dsl
   Studio("table.Create", model_dsl);
@@ -96,7 +114,7 @@ export function login() {
   // const menu = Process("models.xiang.menu.get", {
   //   limit: 1,
   // });
-  const table_name = "admin.login.json";
+  const fname = "admin.login.json";
   const table = JSON.stringify({
     name: "::Admin Login",
     action: {
@@ -111,6 +129,6 @@ export function login() {
       site: "https://yaoapps.com?from=yao-admin",
     },
   });
-  Studio("move.Move", "logins", table_name);
-  fs.WriteFile("/logins/" + table_name, table);
+  Studio("move.Move", "logins", fname);
+  fs.WriteFile("/logins/" + fname, table);
 }

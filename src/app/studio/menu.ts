@@ -1,7 +1,7 @@
 import { FS, Process, Studio } from "yao-node-client";
-import { YaoFlow, YaoMenu } from "yao-app-ts-types";
+import { YaoFlow, YaoMenu, YaoModel } from "yao-app-ts-types";
 
-export function Create(model_dsl: any[]) {
+export function Create(model_dsl: YaoModel.ModelDSL[]) {
   let insert = [] as YaoMenu.MenuItems;
   // let child = [];
   const total = model_dsl.length;
@@ -19,18 +19,19 @@ export function Create(model_dsl: any[]) {
     // }
     // for (const i in model_dsl) {
     // const element = model_dsl[i];
-    const name = model_dsl[i]["table"]["name"];
-    const dotName = Studio("file.DotName", name);
-    const icon = GetIcon(name);
+    const tableName = model_dsl[i].table.comment;
+    const trans = Studio("relation.translate", tableName);
+    const dotName = Studio("file.DotName", tableName);
+    const icon = GetIcon(tableName);
 
     let item: YaoMenu.MenuItem = {
-      name: model_dsl[i].name,
+      name: trans,
       path: "/x/Table/" + dotName, //转换后的
       icon: icon,
       rank: i + 1,
       status: "enabled",
       visible_menu: 0,
-      model: name, //需要用来处理chart.json数据
+      model: tableName, //需要用来处理chart.json数据
       blocks: 0,
       id: (i + 1) * 10,
       children: [],
@@ -94,10 +95,16 @@ export function Create(model_dsl: any[]) {
  * @param {*} name
  */
 export function GetIcon(name: string) {
+  let useTranslate = Process("utils.env.Get", "USE_TRANSLATE");
+  if (!useTranslate) {
+    return "icon-box";
+  }
+
   let url = "https://brain.yaoapps.com/api/icon/search?name=" + name;
   let response = Process("xiang.network.Get", url, {}, {});
   if (response.status == 200) {
     return response.data.data;
   }
+
   return "icon-box";
 }

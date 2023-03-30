@@ -1,7 +1,9 @@
 // import { Studio } from "yao-node-client";
 
 // Studio("model.Create");
-
-import { Create } from "@/app/studio/model";
+import dotenv from "dotenv";
+dotenv.config();
+import { Create, CreateFromModelFiles } from "@/app/studio/model";
 
 Create();
+// CreateFromModelFiles();

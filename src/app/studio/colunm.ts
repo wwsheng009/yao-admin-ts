@@ -181,7 +181,6 @@ export function toTable(model_dsl: YaoModel.ModelDSL) {
   };
   columns.forEach((column) => {
     let col = castTableColumn(column, model_dsl);
-    // console.log("col:", col);
     if (col) {
       // col.layout.filter.columns.forEach((fc) => {});
       col.layout.table.columns.forEach((tc) => {
@@ -217,7 +216,7 @@ export function castTableColumn(
   model_dsl: YaoModel.ModelDSL
 ) {
   // const props = column.props || {};
-  const title = column.label || column.name;
+  let title = column.label || column.name;
   const name = column.name;
 
   // 不展示隐藏列
@@ -233,6 +232,11 @@ export function castTableColumn(
     log.Error("castTableColumn: missing name");
     return false;
   }
+  // let newTitle = title;
+  // if (/_id$/i.test(newTitle)) {
+  //   title = newTitle.replace(/_id$/i, "");
+  // }
+  // title = Studio("relation.translate", title);
 
   if (!title) {
     // console.log("castTableColumn: missing title");

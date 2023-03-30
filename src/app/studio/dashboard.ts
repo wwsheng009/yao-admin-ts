@@ -67,7 +67,7 @@ export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
     temp.forEach((col) => {
       if (col.id != 1) {
         const dotName = Studio("file.DotName", col.model);
-        const title = dotName + "记录数";
+        const title = `${col.name}记录数`;
         // if (col.name != col.model) {
         //   title = col.name + "(" + dotName + ")" + "记录数";
         // }
