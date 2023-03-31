@@ -219,6 +219,49 @@ export function toTable(model_dsl: YaoModel.ModelDSL) {
 
   return tableTemplate;
 }
+
+/**
+ * 更新一些编辑属性
+ * @param component
+ * @param column
+ */
+function updateViewSwitchPropes(
+  component: FieldColumn,
+  column: YaoModel.ModelColumn
+) {
+  if (!component.view) {
+    return;
+  }
+
+  if (column.type !== "Switch") {
+    return;
+  }
+  component.view.props = component.view.props || {};
+
+  const { unique, nullable, default: columnDefault, type } = column;
+
+  if (unique || (!columnDefault && !nullable)) {
+    component.view.props.itemProps = { rules: [{ required: true }] };
+  }
+
+  if (column.comment) {
+    component.view.props["itemProps"] = component.edit.props["itemProps"] || {};
+    component.view.props["itemProps"]["tooltip"] = column.comment;
+  }
+
+  if (column.default != null) {
+    const dbType = getDBType();
+    const defaultValue =
+      /mysql/i.test(dbType) && type === "Switch"
+        ? column.default
+          ? 1
+          : 0
+        : column.default;
+
+    component.view.props["defaultValue"] = defaultValue;
+    component.view.props["value"] = defaultValue;
+  }
+}
 /**
  * 更新一些编辑属性
  * @param component
@@ -235,7 +278,7 @@ function updateEditPropes(
 
   const { unique, nullable, default: columnDefault, type } = column;
 
-  if (unique || (!columnDefault && nullable === false)) {
+  if (unique || (!columnDefault && !nullable)) {
     component.edit.props.itemProps = { rules: [{ required: true }] };
   } else if (/^id$/i.test(type)) {
     component.edit.props.itemProps = {};
@@ -256,6 +299,14 @@ function updateEditPropes(
         : column.default;
 
     component.edit.props["defaultValue"] = defaultValue;
+
+    if (["RadioGroup", "Select"].includes(column.type)) {
+      component.edit.props["value"] = defaultValue;
+    }
+
+    if (component.view && ["Switch"].includes(column.type)) {
+      component.view.props["value"] = defaultValue;
+    }
   }
 }
 export function castTableColumn(
@@ -330,7 +381,7 @@ export function castTableColumn(
             language: "json",
             height: 200,
           },
-          type: "CodeEditor",
+          type: "TextArea",
         },
         view: {
           props: {},
@@ -452,6 +503,7 @@ export function castTableColumn(
   delete component.is_select;
 
   updateEditPropes(component, column);
+  updateViewSwitchPropes(component, column);
 
   res.fields.table.push({
     name: title,
