@@ -16,9 +16,7 @@
         //"sourceMap": true
         "${workspaceFolder}/dist/**/*.js"
       ],
-      "env": {
-        "USE_TRANSLATE": "TRUE"
-      },
+
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
@@ -42,9 +40,6 @@
         "tsconfig-paths/register", //解析@=>src
         "${workspaceFolder}/src/debugger/index.ts" //"${file}"
       ],
-      "env": {
-        "USE_TRANSLATE": "TRUE"
-      },
       "skipFiles": ["<node_internals>/**", "node_modules/**"]
     }
   ]

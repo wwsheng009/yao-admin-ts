@@ -3,6 +3,7 @@ import { Studio } from "yao-node-client";
 import { FieldColumn } from "./types";
 
 /**
+ * yao studio run selector.Select
  * 把hasOne变成下拉选择
  * @param {*} column
  * @param {*} model_dsl
@@ -25,27 +26,42 @@ export function Select(
       relation[rel].type == "hasOne" &&
       column.name == relation[rel]["foreign"]
     ) {
+      const dotName = Studio("file.DotName", relation[rel].model);
       const field = Studio("remote.select", rel, relation[rel]);
       let component: FieldColumn = {
         is_select: true,
         // bind: i + "." + field,
         bind,
-        view: { props: props, type: "Text" },
+        view: {
+          type: "Tag",
+          props: {
+            xProps: {
+              $remote: {
+                process: "yao.component.SelectOptions",
+                query: {
+                  model: dotName,
+                  label: field,
+                  value: "id",
+                },
+              },
+            },
+            ...props,
+          },
+        },
         edit: {
           type: "Select",
           props: {
             xProps: {
               $remote: {
                 process: "yao.component.SelectOptions",
-                //"scripts." + relation[i].model + "." + i + ".GetSelect",
-                // process: "models." + relation[i]["model"] + ".Get",
                 query: {
-                  model: Studio("file.DotName", relation[rel].model),
+                  model: dotName,
                   label: field,
                   value: "id",
                 },
               },
             },
+            ...props,
           },
         },
       };
@@ -62,9 +78,7 @@ export function EditSelect(
   component: FieldColumn
 ) {
   const props = column.props || {};
-  // const title = column.label;
   const name = column.name;
-  // console.log("column name:", name);
   const bind = `${name}`;
   const relation = model_dsl.relations;
 
@@ -76,15 +90,12 @@ export function EditSelect(
       const field = Studio("remote.select", rel, relation[rel]);
       let component: FieldColumn = {
         bind: bind,
-        view: { props: props, type: "Text" },
         edit: {
           type: "Select",
           props: {
             xProps: {
               $remote: {
                 process: "yao.component.SelectOptions",
-                // "scripts." + relation[i].model + "." + i + ".GetSelect",
-                // process: "models." + relation[i]["model"] + ".Get",
                 query: {
                   model: Studio("file.DotName", relation[rel].model),
                   label: field,
@@ -92,6 +103,7 @@ export function EditSelect(
                 },
               },
             },
+            ...props,
           },
         },
       };
@@ -102,9 +114,8 @@ export function EditSelect(
   return component;
 }
 
+/**增加关联表关系 */
 function Withs(component: FieldColumn, relation_name: string) {
-  // "option": { "withs": { "user": {} } }
-
   const withs = [];
   withs.push({
     name: relation_name,
@@ -114,7 +125,7 @@ function Withs(component: FieldColumn, relation_name: string) {
 }
 
 /**
- * 把hasMany变成列表
+ * 把hasMany变成表单中的Table
  */
 export function Table(form_dsl: YaoForm.FormDSL, model_dsl: YaoModel.ModelDSL) {
   const relation = model_dsl.relations;

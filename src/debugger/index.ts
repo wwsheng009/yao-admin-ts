@@ -3,7 +3,7 @@
 // Studio("model.Create");
 import dotenv from "dotenv";
 dotenv.config();
-import { Create, CreateFromModelFiles } from "@/app/studio/model";
+import { Create, CreateLocal } from "@/app/studio/model";
 
-Create();
+CreateLocal();
 // CreateFromModelFiles();

@@ -1,11 +1,20 @@
 import { YaoModel } from "yao-app-ts-types";
 import { FS, Process, Studio } from "yao-node-client";
 
-export function select(relation_name: any, relation: { model: any }) {
-  let model: YaoModel.ModelDSL = Process(
-    "schemas.default.TableGet",
-    relation_name
-  );
+/**
+ * //根据关联关系找到列，并查找列对应的模型
+ * yao studio run remote.select
+ * @param relation_name
+ * @param relation
+ * @returns
+ */
+export function select(relation_name: string, releation: YaoModel.Relation) {
+  //首先从关联关系的模型中找到模型
+  let model: YaoModel.ModelDSL = Studio("model.Get", releation.model);
+  if (!model) {
+    model = Process("schemas.default.TableGet", relation_name);
+  }
+
   const columns = model.columns;
   let res = Speculation(columns);
   if (!res) {

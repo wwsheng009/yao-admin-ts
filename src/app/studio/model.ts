@@ -39,9 +39,23 @@ export function CreateModels() {
   return model_dsl;
 }
 
+/**
+ * yao studio run model.Get
+ * @param model_name
+ * @returns
+ */
+export function Get(model_name: string): YaoModel.ModelDSL | boolean {
+  const fs = new FS("dsl");
+  let model_file_name = Studio("file.SlashName", model_name);
+  const fname = "models/" + model_file_name + ".mod.json";
+  if (!fs.Exists(fname)) {
+    return false;
+  }
+  return JSON.parse(fs.ReadFile(fname));
+}
 function getAllModelsFromFile(): string[] {
   const fs = new FS("dsl");
-  const files = fs.ReadDir("models/", true);
+  const files: string[] = fs.ReadDir("models/", true);
 
   return files
     .filter((file) => !fs.IsDir(file) && file.endsWith(".mod.json"))
@@ -50,7 +64,7 @@ function getAllModelsFromFile(): string[] {
 /**
  * 根据本地的模型文件创建表格与表单配置
  */
-export function CreateFromModelFiles() {
+export function CreateLocal() {
   const files = getAllModelsFromFile();
   const fs = new FS("dsl");
   const model_dsl = files.map((file) => {
