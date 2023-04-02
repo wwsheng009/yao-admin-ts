@@ -35,6 +35,16 @@ export function CreatTypes(models: YaoModel.ModelDSL[]) {
       }, [])
       .join("\n");
 
+    let rels: string[] = [];
+    for (const key in model.relations) {
+      const element = model.relations[key];
+      let sign = "";
+      if (element.type === "hasMany") {
+        sign = "[]";
+      }
+      rels.push(`    /** Relation: ${key}=> ${element.model} */
+    ${key}?: ${element.model.replaceAll(".", "_")}${sign}`);
+    }
     return `
   /**
    * Model=> ${dotName} ${model.name ? "(" + model.name + ")" : ""}
@@ -45,6 +55,7 @@ export function CreatTypes(models: YaoModel.ModelDSL[]) {
   */
   export interface ${last} {
 ${fields}
+${rels.join("\n")}
   }
   `;
   });

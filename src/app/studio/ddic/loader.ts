@@ -18,7 +18,14 @@ export function LoadModel(modelDsls: YaoModel.ModelDSL[]) {
 
     let id = data?.id;
 
-    let model: ddic_model = { id, ...data, ...modelDsl, ...modelDsl.option };
+    let model: ddic_model = {
+      id,
+      ...data,
+      // ...modelDsl,
+      // ...modelDsl.option,
+      // columns: modelDsl.columns,
+    };
+    //TODO map the columns
     model.table_name = tableName;
     model.model_comment = modelDsl.comment;
     model.table_comment = modelDsl.table?.comment;

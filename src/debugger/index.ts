@@ -7,9 +7,9 @@
 // CreateFromFile();
 // CreateFromModelFiles();
 
-import { LoadModelFromFile } from "@/app/studio/ddic/loader";
+// import { LoadModelFromFile } from "@/app/studio/ddic/loader";
 
-//yao studio run ddic.loader.LoadModelFromFile
+// //yao studio run ddic.loader.LoadModelFromFile
 // LoadModelFromFile();
 
 import { CreateModelTypes } from "@/app/studio/model/ts";
