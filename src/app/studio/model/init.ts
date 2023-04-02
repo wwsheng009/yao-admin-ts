@@ -1,4 +1,4 @@
-import { Exception, Studio } from "yao-node-client";
+import { Exception } from "yao-node-client";
 import { FS, Process } from "yao-node-client";
 
 //在form与table配置中，yao可以只配置简单的与模型的绑定关系就能带出所有的配置，
@@ -349,6 +349,6 @@ function CreateTableAndForm(model: string) {
 // CreateTableAndForm("chat.prompt_template");
 
 // 使用命令行
-// yao-debug studio run init.CreateTable supplier
-// yao-debug studio run init.CreateForm supplier
-// yao-debug studio run init.CreateTableAndForm supplier
+// yao-debug studio run model.init.CreateTable supplier
+// yao-debug studio run model.init.CreateForm supplier
+// yao-debug studio run model.init.CreateTableAndForm supplier

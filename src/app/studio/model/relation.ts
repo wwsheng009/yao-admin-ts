@@ -5,16 +5,16 @@ const parents = ["parent", "parent_id", "pid"];
 const children = ["children", "children_id", "child", "child_id"];
 /**
  * 关联关系分析同一个表中关联关系
- * @param {*} model_name
+ * @param {*} modelName
  * @param {*} columns
- * @param {*} table_struct
+ * @param {*} tableStruct
  */
 export function child(
   modelName: string,
   columns: YaoModel.ModelColumn[],
   tableStruct: YaoModel.ModelDSL
 ): YaoModel.ModelDSL {
-  const dotName = Studio("file.DotName", modelName);
+  const dotName = Studio("model.file.DotName", modelName);
   const childColumns = columns.filter(
     (column) => column.type === "integer" && children.includes(column.name)
   );
@@ -43,7 +43,7 @@ export function parent(
   columns: YaoModel.ModelColumn[],
   table_struct: YaoModel.ModelDSL
 ) {
-  const dotName = Studio("file.DotName", model_name);
+  const dotName = Studio("model.file.DotName", model_name);
   const parentColumn = columns.find(
     (column) => column.type === "integer" && parents.includes(column.name)
   );
@@ -74,7 +74,7 @@ export function other(all_table_struct: YaoModel.ModelDSL[]) {
   return all_table_struct;
 }
 
-// yao studio run relation.translate member_id
+// yao studio run model.relation.translate member_id
 export function translate(keywordsIn: string) {
   let useTranslate = Process("utils.env.Get", "USE_TRANSLATE");
   if (useTranslate !== "TRUE") {
@@ -148,13 +148,13 @@ export function BatchModel(keywords: YaoModel.ModelDSL[]): YaoModel.ModelDSL[] {
   const models = keywords;
   models.forEach((model) => {
     model.columns.forEach((col) => {
-      col.label = Studio("relation.translate", col.label); //col.label.replace(/_id$/i, "");
+      col.label = Studio("model.relation.translate", col.label); //col.label.replace(/_id$/i, "");
       // col.name = col.name.replace(/_id$/i, "");
     });
 
-    model.comment = Studio("relation.translate", model.name);
+    model.comment = Studio("model.relation.translate", model.name);
     model.table.comment = model.table.name;
-    model.table.name = Studio("relation.translate", model.table.name);
+    model.table.name = Studio("model.relation.translate", model.table.name);
   });
   return models;
 
@@ -182,13 +182,19 @@ export function hasOne(
   all_table: YaoModel.ModelDSL[]
 ): YaoModel.ModelDSL[] {
   const foreignIds = [`${table_name}_id`, `${table_name}ID`, `${table_name}Id`];
-  const prefix: string[] = Studio("schema.TablePrefix");
+  const prefix: string[] = Studio("model.schema.TablePrefix");
   if (prefix.length) {
-    foreignIds.push(`${Studio("schema.ReplacePrefix", prefix, table_name)}_id`);
-    foreignIds.push(`${Studio("schema.ReplacePrefix", prefix, table_name)}ID`);
-    foreignIds.push(`${Studio("schema.ReplacePrefix", prefix, table_name)}Id`);
+    foreignIds.push(
+      `${Studio("model.schema.ReplacePrefix", prefix, table_name)}_id`
+    );
+    foreignIds.push(
+      `${Studio("model.schema.ReplacePrefix", prefix, table_name)}ID`
+    );
+    foreignIds.push(
+      `${Studio("model.schema.ReplacePrefix", prefix, table_name)}Id`
+    );
   }
-  const dotName: string = Studio("file.DotName", table_name);
+  const dotName: string = Studio("model.file.DotName", table_name);
   return all_table.map((table) => {
     table.columns.forEach((column) => {
       if (foreignIds.includes(column.name)) {
@@ -211,8 +217,8 @@ export function hasMany(
   allTables: YaoModel.ModelDSL[]
 ) {
   const relationSuffixes = ["_id", "_ID", "_Id"];
-  const tablePrefixes: string[] = Studio("schema.TablePrefix");
-  const dotName = Studio("file.DotName", tableName);
+  const tablePrefixes: string[] = Studio("model.schema.TablePrefix");
+  const dotName = Studio("model.file.DotName", tableName);
 
   for (const suffix of relationSuffixes) {
     for (const table of allTables) {

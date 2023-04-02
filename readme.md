@@ -29,3 +29,12 @@ pnpm run debug
 ```sh
 ./deploy.sh
 ```
+
+命令
+
+```sh
+#加载模型数据
+yao studio run ddic.loader.LoadModelFromFile
+
+yao studio run model.cmd.CreateFromFile
+```

@@ -3,14 +3,14 @@ import { FS, Process, Studio } from "yao-node-client";
 
 /**
  * //根据关联关系找到列，并查找列对应的模型
- * yao studio run remote.select
+ * yao studio run model.remote.select
  * @param relation_name
  * @param relation
  * @returns
  */
 export function select(relation_name: string, releation: YaoModel.Relation) {
   //首先从关联关系的模型中找到模型
-  let model: YaoModel.ModelDSL = Studio("model.Get", releation.model);
+  let model: YaoModel.ModelDSL = Studio("model.cmd.Get", releation.model);
   if (!model) {
     model = Process("schemas.default.TableGet", relation_name);
   }
@@ -45,7 +45,12 @@ export function GetTarget(
   columns: YaoModel.ModelColumn[]
 ): string | false {
   const columnNames = columns.map((col) => col.name);
-  return columnNames.find((name) => name.includes(target)) ?? false;
+
+  return (
+    columnNames.find((name) => name === target) ??
+    columnNames.find((name) => name.includes(target)) ??
+    false
+  );
 }
 /**
  * 没有其他的话,就找个string类型的
@@ -69,7 +74,7 @@ export function CreateScripts(
 ) {
   const field_name = relation_name + ".js";
   const fs = new FS("script");
-  const form_dsl = `export function GetSelect() {
+  const formDsl = `export function GetSelect() {
     let query = new Query();
     let res = query.Get({
       select: ["id as value", "${name} as label"],
@@ -79,10 +84,10 @@ export function CreateScripts(
   }
   `;
   const dir = relation.model + "/" + field_name;
-  //console.log(form_dsl);
+  //console.log(formDsl);
 
-  Studio("move.Move", "scripts", field_name);
-  fs.WriteFile("/" + dir, form_dsl);
+  Studio("model.move.Move", "scripts", field_name);
+  fs.WriteFile("/" + dir, formDsl);
 }
 
 // export function GetSelect() {

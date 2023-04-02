@@ -1,10 +1,10 @@
 import { FS, Process, Studio } from "yao-node-client";
 import { YaoFlow, YaoMenu, YaoModel } from "yao-app-ts-types";
 
-export function Create(model_dsl: YaoModel.ModelDSL[]) {
+export function Create(modelDsl: YaoModel.ModelDSL[]) {
   let insert = [] as YaoMenu.MenuItems;
   // let child = [];
-  const total = model_dsl.length;
+  const total = modelDsl.length;
   insert.push({
     blocks: 0,
     icon: "icon-activity",
@@ -17,21 +17,21 @@ export function Create(model_dsl: YaoModel.ModelDSL[]) {
 
   const english = /^[A-Za-z0-9\._-]*$/;
 
-  for (let i = 0; i < model_dsl.length; i++) {
+  for (let i = 0; i < modelDsl.length; i++) {
     // }
-    // for (const i in model_dsl) {
-    // const element = model_dsl[i];
-    let tableName = model_dsl[i].table.name;
+    // for (const i in modelDsl) {
+    // const element = modelDsl[i];
+    let tableName = modelDsl[i].table.name;
     if (!english.test(tableName)) {
-      tableName = model_dsl[i].table.comment;
+      tableName = modelDsl[i].table.comment;
     }
 
-    // const trans = Studio("relation.translate", tableName);
-    const dotName = Studio("file.DotName", tableName);
+    // const trans = Studio("model.relation.translate", tableName);
+    const dotName = Studio("model.file.DotName", tableName);
     const icon = GetIcon(tableName);
 
     let item: YaoMenu.MenuItem = {
-      name: model_dsl[i].table.comment,
+      name: modelDsl[i].table.comment,
       path: "/x/Table/" + dotName, //转换后的
       icon: icon,
       rank: i + 1,
@@ -55,8 +55,8 @@ export function Create(model_dsl: YaoModel.ModelDSL[]) {
       insert.push(item);
     }
   }
-  // Studio("move.Mkdir", "flows");
-  Studio("move.Mkdir", "flows/app");
+  // Studio("model.move.Mkdir", "flows");
+  Studio("model.move.Mkdir", "flows/app");
   const fs = new FS("dsl");
 
   const dsl: YaoFlow.Flow = {
@@ -88,15 +88,15 @@ export function Create(model_dsl: YaoModel.ModelDSL[]) {
 
   // 创建看板
   if (total >= 10) {
-    Studio("dashboard.Create", insert, 1);
+    Studio("model.dashboard.Create", insert, 1);
   } else {
-    Studio("dashboard.Create", insert, 2);
+    Studio("model.dashboard.Create", insert, 2);
   }
 
   //Process("models.xiang.menu.insert", columns, insert);
 }
 
-/**yao studio run menu.icon user
+/**yao studio run model.menu.icon user
  * 获取菜单图标
  * @param {*} name
  */

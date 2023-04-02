@@ -9,7 +9,7 @@ import { FS, Query, Studio } from "yao-node-client";
 export function Create(menu_arr: YaoMenu.MenuItem[], type: number) {
   const fs = new FS("dsl");
 
-  Studio("move.Move", "charts", "dashboard.chart.json");
+  Studio("model.move.Move", "charts", "dashboard.chart.json");
   let dsl = Dsl(menu_arr, type);
   //console.log(`create dashboard:/charts/dashboard.chart.json"`);
   fs.WriteFile("/charts/" + "dashboard.chart.json", JSON.stringify(dsl));
@@ -66,7 +66,7 @@ export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
     script.model_count = script.table_count;
     temp.forEach((col) => {
       if (col.id != 1) {
-        const dotName = Studio("file.DotName", col.extra);
+        const dotName = Studio("model.file.DotName", col.extra);
         const title = `${col.name}记录数`;
         // if (col.name != col.model) {
         //   title = col.name + "(" + dotName + ")" + "记录数";
@@ -86,7 +86,7 @@ export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
 
     menu_arr.forEach((col) => {
       if (col.id != 1) {
-        const dotName = Studio("file.DotName", col.extra);
+        const dotName = Studio("model.file.DotName", col.extra);
         const title = dotName + "记录数";
         // if (col.name != col.model) {
         //   title = col.name + "(" + dotName + ")" + "记录数";

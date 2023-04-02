@@ -1,5 +1,4 @@
-import { MapAny, YaoComponent, YaoField } from "yao-app-ts-types";
-import { boolean } from "yargs";
+import { YaoComponent, YaoField } from "yao-app-ts-types";
 
 /**从数据库表中获取的字段定义 */
 export type FieldColumn = YaoField.ColumnDSL & {
@@ -8,7 +7,7 @@ export type FieldColumn = YaoField.ColumnDSL & {
   /**是否图片 */
   is_image?: boolean;
   /**关联表 */
-  withs?: MapAny;
+  // withs?: MapAny;
 }; // & MapAny;
 
 export interface TableDefinition {

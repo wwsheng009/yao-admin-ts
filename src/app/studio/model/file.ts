@@ -1,6 +1,6 @@
-import { MapAny, YaoComponent, YaoField, YaoModel } from "yao-app-ts-types";
-import { FS, Studio } from "yao-node-client";
-import { FieldColumn } from "./types";
+import { YaoModel } from "yao-app-ts-types";
+import { FS } from "yao-node-client";
+import { FieldColumn } from "../types";
 
 // 根据图片组件更新组件类型,只查看
 export function File(
@@ -58,13 +58,13 @@ export function File(
  * 根据图片组件更新组件类型,可上传
  * @param column 模型中的字段定义
  * @param component 数据库字段定义
- * @param model_dsl 模型引用
+ * @param modelDsl 模型引用
  * @returns
  */
 export function FormFile(
   column: YaoModel.ModelColumn,
   component: FieldColumn,
-  model_dsl: YaoModel.ModelDSL
+  modelDsl: YaoModel.ModelDSL
 ): FieldColumn {
   var guard = [
     "img",
@@ -98,7 +98,7 @@ export function FormFile(
           type: "Upload",
           compute: {
             process: "scripts.file.image.ImagesEdit",
-            args: ["$C(row)", "$C(type)", name, model_dsl.table.name],
+            args: ["$C(row)", "$C(type)", name, modelDsl.table.name],
           },
           props: {
             filetype: "image",
@@ -114,8 +114,8 @@ export function FormFile(
 }
 
 /**
- * yao studio run file.DotName table_name
- * yao studio run file.DotName /file/name
+ * yao studio run model.file.DotName table_name
+ * yao studio run model.file.DotName /file/name
  * @param {string} pathname
  * @returns model name with dot
  */
@@ -130,7 +130,7 @@ export function DotName(pathname: string) {
   return newStr;
 }
 /**
- * yao studio run file.SlashName crm_help
+ * yao studio run model.file.SlashName crm_help
  * @param {string} pathname
  * @returns pathname
  */
@@ -145,9 +145,9 @@ export function SlashName(pathname: string) {
   return newStr;
 }
 /**
- * yao studio run file.FileNameConvert "/models/cms__help.mod.json"
- * yao studio run file.FileNameConvert "/models/cms.help.mod.json"
- * yao studio run file.FileNameConvert "/models/cms.json"
+ * yao studio run model.file.FileNameConvert "/models/cms__help.mod.json"
+ * yao studio run model.file.FileNameConvert "/models/cms.help.mod.json"
+ * yao studio run model.file.FileNameConvert "/models/cms.json"
  * @param {string} filename
  * @returns new filename
  */
@@ -180,9 +180,9 @@ export function FileNameConvert(filename: string) {
 // }
 /**
  * write file
- * yao studio run file.WriteFile "/models/cms_help.mod.json"
- * yao studio run file.WriteFile "/models/cms.help.mod.json"
- * yao studio run file.WriteFile "/models/cms.json"
+ * yao studio run model.file.WriteFile "/models/cms_help.mod.json"
+ * yao studio run model.file.WriteFile "/models/cms.help.mod.json"
+ * yao studio run model.file.WriteFile "/models/cms.json"
  * @param {string} filename filename
  * @param {object} data
  */
