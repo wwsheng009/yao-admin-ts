@@ -511,10 +511,17 @@ export function castTableColumn(
   updateEditPropes(component, column);
   updateViewSwitchPropes(component, column);
   updateTableComponentFromModel(component, column, modelDsl);
-  res.layout.table.columns.push({
-    name: title,
-    width: width,
-  });
+  if (
+    !component.view ||
+    !component.view?.props ||
+    !component.view?.props?.ddic_hide
+  ) {
+    res.layout.table.columns.push({
+      name: title,
+      width: width,
+    });
+  }
+
   delete component.is_select;
   res.fields.table.push({
     name: title,
@@ -902,7 +909,7 @@ function mergeObjects(target: MapAny, source: MapAny) {
     typeof source !== "object" ||
     source == null //mybe undefined
   ) {
-    return;
+    return target;
   }
 
   for (let key in source) {
