@@ -1,4 +1,4 @@
-import { YaoComponent, YaoField } from "yao-app-ts-types";
+import { YaoComponent, YaoField, YaoForm } from "yao-app-ts-types";
 
 /**从数据库表中获取的字段定义 */
 export type FieldColumn = YaoField.ColumnDSL & {
@@ -44,7 +44,7 @@ export interface TableDefinition {
 
 export interface FormDefinition {
   /**布局定义 */
-  layout: YaoComponent.LayoutColumns;
+  layout: YaoForm.Column[];
   /**字段类型定义 */
   fields: {
     /**字段名称 */

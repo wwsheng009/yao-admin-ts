@@ -113,6 +113,32 @@ export function CreateOne(model_name: string) {
   //version10_0_2();
   //login();
 }
+/**
+ * Create List DSL By Model Name
+ * yao studio run model.cmd.CreateList
+ * @param modelName model name
+ */
+export function CreateList(modelName: string) {
+  const model = Get(modelName);
+  if (model) {
+    CreateListByModel(model as YaoModel.ModelDSL);
+  }
+}
+/**
+ * yao studio run model.table.CreateList
+ * @param modelDsl model dsl
+ */
+export function CreateListByModel(modelDsl: YaoModel.ModelDSL) {
+  let tableName = Studio("model.file.SlashName", modelDsl.table.name);
+
+  let listFileName = tableName + ".list.json";
+  let listDsl = Studio("model.colunm.toList", modelDsl); //这里有studio js读取操作
+  let listJson = JSON.stringify(listDsl);
+
+  let fs = new FS("dsl");
+  Studio("model.move.Move", "lists", listFileName);
+  fs.WriteFile("/lists/" + listFileName, listJson);
+}
 
 /**
  * 写入10.3版本的

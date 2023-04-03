@@ -39,4 +39,9 @@ yao studio run model.cmd.CreateFromFile
 #加载模型数据
 yao studio run ddic.loader.LoadModelFromFile
 
+
+
+yao studio run model.cmd.CreateList ddic.model.relation
+
+yao start
 ```

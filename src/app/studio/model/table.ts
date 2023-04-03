@@ -34,15 +34,3 @@ export function Create(modelDsl: YaoModel.ModelDSL[]) {
     fs.WriteFile("/tables/" + tableFileName, table);
   }
 }
-
-export function CreateList(modelDsl: YaoModel.ModelDSL) {
-  let tableName = Studio("model.file.SlashName", modelDsl.table.name);
-
-  let listFileName = tableName + ".list.json";
-  let listDsl = Studio("model.colunm.toList", modelDsl); //这里有studio js读取操作
-  let listJson = JSON.stringify(listDsl);
-
-  let fs = new FS("dsl");
-  Studio("model.move.Move", "lists", listFileName);
-  fs.WriteFile("/lists/" + listFileName, listJson);
-}

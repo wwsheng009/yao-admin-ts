@@ -2,15 +2,17 @@
 
 // import dotenv from "dotenv";
 // dotenv.config();
-import { CreateFromDB, CreateFromFile } from "@/app/studio/model/cmd";
+// import { CreateFromDB, CreateFromFile } from "@/app/studio/model/cmd";
 
-CreateFromFile();
-// CreateFromModelFiles();
+// CreateFromFile();
 
-// import { LoadModelFromFile } from "@/app/studio/ddic/loader";
+import { LoadModelFromFile } from "@/app/studio/ddic/loader";
 
-// //yao studio run ddic.loader.LoadModelFromFile
+//yao studio run ddic.loader.LoadModelFromFile
 // LoadModelFromFile();
 
 // import { CreateModelTypes } from "@/app/studio/model/ts";
 // CreateModelTypes();
+
+import { CreateList } from "@/app/studio/model/cmd";
+CreateList("ddic.model.relation");

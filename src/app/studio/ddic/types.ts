@@ -9,21 +9,15 @@ export interface ddic_domain {
   /**undefined */
   name: string;
   /**字段类型定义 */
-  field_type_id?: number;
+  type?: string;
   /**字段长度，对string等类型字段有效 */
   length?: number;
   /**字段位数(含小数位)，对float、decimal等类型字段有效 */
   precision?: number;
   /**字段小数位位数，对float、decimal等类型字段有效 */
   scale?: number;
-  /**字段是否可以为空，默认为 false */
-  nullable?: boolean;
-  /**字段许可值，对enum类型字段有效 */
-  option?: string;
-  /**字段默认值 */
-  default?: string;
-  /**字段加密存储方式。许可值 `AES(MySQL Only)`, `PASSWORD` */
-  crypt?: "" | "PASSWORD" | "AES";
+  /**字段的可选项，对enum类型字段有效 */
+  options?: string;
   /**字段校验规则 */
   validations?: string;
 }
@@ -41,7 +35,7 @@ export interface ddic_element {
   /**域定义 */
   domain_id?: number;
   /**字段类型定义 */
-  field_type_id?: number;
+  type?: string;
   /**字段长度，对 `string` 等类型字段有效 */
   length?: number;
   /**字段位数(含小数位)，对 `float`、`decimal` 等类型字段有效 */
@@ -50,14 +44,12 @@ export interface ddic_element {
   scale?: number;
   /**字段是否可以为空，默认为 false */
   nullable?: boolean;
-  /**字段许可值，对 `enum` 类型字段有效 */
-  option?: string;
   /**string|number|float|字段默认值 */
   default?: string;
   /**字段加密存储方式。许可值 `AES(MySQL Only)`, `PASSWORD` */
   crypt?: "PASSWORD" | "AES";
-  /**字段校验规则 */
-  validations?: string;
+  /** Relation: domain=> ddic.domain */
+  domain?: ddic_domain;
 }
 
 /**
@@ -82,6 +74,8 @@ export interface ddic_form_action {
   showWhenView?: boolean;
   /**Action列表 */
   action: string;
+  /** Relation: form=> ddic.form */
+  form?: ddic_form;
 }
 
 /**
@@ -120,6 +114,8 @@ export interface ddic_form_field {
   default: string;
   /**是否显示 */
   is_dispaly?: boolean;
+  /** Relation: form=> ddic.form */
+  form?: ddic_form;
 }
 
 /**
@@ -142,6 +138,12 @@ export interface ddic_form {
   bind_option: string;
   /**表注释 */
   comment: string;
+  /** Relation: model=> ddic.model */
+  model?: ddic_model;
+  /** Relation: table=> ddic.table */
+  table?: ddic_table;
+  /** Relation: fields=> ddic.form.field */
+  fields?: ddic_form_field[];
 }
 
 /**
@@ -153,9 +155,9 @@ export interface ddic_model_column_type {
   /**标识 */
   id?: number;
   /**undefined */
-  name: string;
-  /**undefined */
   type: string;
+  /**undefined */
+  name: string;
   /**注释 */
   comment?: string;
 }
@@ -172,14 +174,12 @@ export interface ddic_model_column {
   model_id: number;
   /**数据库表的字段名 */
   name: string;
-  /**域ID */
-  domain_id?: number;
   /**数据元素ID */
   element_id?: number;
   /**字段显示名称，用于在管理表单，开发平台等成场景下呈现 */
   label?: string;
   /**字段类型定义 */
-  field_type_id?: number;
+  type?: string;
   /**字段长度，对 `string` 等类型字段有效 */
   length?: number;
   /**字段位数(含小数位)，对 `float`、`decimal` 等类型字段有效 */
@@ -188,14 +188,10 @@ export interface ddic_model_column {
   scale?: number;
   /**是否空值，默认为 false */
   nullable?: boolean;
-  /**字段许可值，对 `enum` 类型字段有效 */
-  option?: string;
   /**string|number|float|字段默认值 */
   default?: string;
   /**字段加密存储方式。许可值 `AES(MySQL Only)`, `PASSWORD` */
   crypt?: "PASSWORD" | "AES";
-  /**字段校验规则 */
-  validations?: string;
   /**字段是否为索引，默认为 false */
   index?: boolean;
   /**字段是否为唯一索引，默认为 false , 如为 true 无需同时将 `index` 设置为 true */
@@ -204,6 +200,10 @@ export interface ddic_model_column {
   primary?: boolean;
   /**注释 */
   comment?: string;
+  /** Relation: model=> ddic.model */
+  model?: ddic_model;
+  /** Relation: element=> ddic.element */
+  element?: ddic_element;
 }
 
 /**
@@ -223,9 +223,11 @@ export interface ddic_model_relation {
   /**外键 */
   foreign: string;
   /**主键 */
-  key_id: number;
+  key: string;
   /**关联条件 */
   query?: string;
+  /** Relation: model=> ddic.model */
+  model?: ddic_model;
 }
 
 /**
@@ -250,7 +252,9 @@ export interface ddic_model {
   soft_deletes?: boolean;
   /**增加创建，更新时间戳 */
   timestamps?: boolean;
-
+  /**关联关系 */
+  relations?: string;
+  /** Relation: columns=> ddic.model.column */
   columns?: ddic_model_column[];
 }
 
@@ -276,6 +280,8 @@ export interface ddic_table_action {
   showWhenView?: boolean;
   /**Action列表 */
   action: string;
+  /** Relation: form=> ddic.form */
+  form?: ddic_form;
 }
 
 /**
@@ -314,6 +320,8 @@ export interface ddic_table_field {
   is_dispaly?: boolean;
   /**是否编辑 */
   is_edit?: boolean;
+  /** Relation: table=> ddic.table */
+  table?: ddic_table;
 }
 
 /**
@@ -352,6 +360,8 @@ export interface ddic_table_filter {
   is_dispaly?: boolean;
   /**是否编辑 */
   is_edit?: boolean;
+  /** Relation: table=> ddic.table */
+  table?: ddic_table;
 }
 
 /**
@@ -372,6 +382,12 @@ export interface ddic_table {
   comment: string;
   /**介绍 */
   description: string;
+  /** Relation: fields=> ddic.table.field */
+  fields?: ddic_table_field[];
+  /** Relation: model=> ddic.model */
+  model?: ddic_model;
+  /** Relation: form=> ddic.form */
+  form?: ddic_form;
 }
 
 /**
