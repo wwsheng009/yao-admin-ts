@@ -33,8 +33,10 @@ pnpm run debug
 命令
 
 ```sh
+
+# 根据模型生成界面定义
+yao studio run model.cmd.CreateFromFile
 #加载模型数据
 yao studio run ddic.loader.LoadModelFromFile
 
-yao studio run model.cmd.CreateFromFile
 ```
