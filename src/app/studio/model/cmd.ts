@@ -132,7 +132,7 @@ export function CreateListByModel(modelDsl: YaoModel.ModelDSL) {
   let tableName = Studio("model.file.SlashName", modelDsl.table.name);
 
   let listFileName = tableName + ".list.json";
-  let listDsl = Studio("model.colunm.toList", modelDsl); //这里有studio js读取操作
+  let listDsl = Studio("model.column.list.toList", modelDsl); //这里有studio js读取操作
   // let listJson = JSON.stringify(listDsl);
 
   // let fs = new FS("dsl");
