@@ -4,9 +4,10 @@
 // dotenv.config();
 
 // create dsls from data model dsl files
-import { CreateFromDB, CreateFromFile } from "@/app/studio/model/cmd";
+import { CreateMenuFromFile, CreateFromFile } from "@/app/studio/model/cmd";
 
-CreateFromFile();
+// CreateFromFile();
+CreateMenuFromFile();
 
 import { LoadModelFromFile } from "@/app/studio/ddic/loader";
 

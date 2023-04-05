@@ -10,7 +10,7 @@ export function Create(menu_arr: YaoMenu.MenuItem[], type: number) {
   // const fs = new FS("dsl");
 
   // Studio("model.move.Move", "charts", "dashboard.chart.json");
-  let dsl = ChartDsl(menu_arr, type);
+  let dsl = ChartDsl(menu_arr);
   //console.log(`create dashboard:/charts/dashboard.chart.json"`);
   // fs.WriteFile("/charts/" + "dashboard.chart.json", JSON.stringify(dsl));
 
@@ -19,10 +19,9 @@ export function Create(menu_arr: YaoMenu.MenuItem[], type: number) {
 /**
  * 根据菜单创建图表
  * @param menu_arr 菜单列表
- * @param type 类型，1是二级菜单，2是一级菜单
  * @returns
  */
-export function ChartDsl(menu_arr: YaoMenu.MenuItem[], type: number) {
+export function ChartDsl(menu_arr: YaoMenu.MenuItem[]) {
   let dsl: YaoChart.ChartDSL = {
     name: "数据图表",
     action: {
@@ -61,48 +60,25 @@ export function ChartDsl(menu_arr: YaoMenu.MenuItem[], type: number) {
     model_count: 0,
   };
 
-  // 说明是二级菜单
-  if (type == 1) {
-    let temp = menu_arr[1]["children"];
-    script.table_count = temp.length;
-    script.model_count = script.table_count;
-    temp.forEach((col) => {
-      if (col.id != 1) {
-        const dotName = Studio("model.file.DotName", col.extra);
-        const title = `${col.name}记录数`;
-        // if (col.name != col.model) {
-        //   title = col.name + "(" + dotName + ")" + "记录数";
-        // }
-        script[col.extra] = GetCount(col.extra);
-        chart[title] = {
-          bind: col.extra,
-          link: "/x/Table/" + dotName,
-          view: { type: "Number", props: { unit: "条" } },
-        };
-        columns.push({ name: title, width: 6 });
-      }
-    });
-  } else {
-    script.table_count = menu_arr.length - 1;
-    script.model_count = script.table_count;
+  script.table_count = menu_arr.length;
+  script.model_count = script.table_count;
 
-    menu_arr.forEach((col) => {
-      if (col.id != 1) {
-        const dotName = Studio("model.file.DotName", col.extra);
-        const title = dotName + "记录数";
-        // if (col.name != col.model) {
-        //   title = col.name + "(" + dotName + ")" + "记录数";
-        // }
-        script[col.extra] = GetCount(col.extra);
-        chart[title] = {
-          bind: col.extra,
-          link: "/x/Table/" + dotName,
-          view: { type: "Number", props: { unit: "条" } },
-        };
-        columns.push({ name: title, width: 6 });
-      }
-    });
-  }
+  menu_arr.forEach((col) => {
+    if (col.id != 1) {
+      const dotName = Studio("model.file.DotName", col.extra);
+      const title = dotName + "记录数";
+      // if (col.name != col.model) {
+      //   title = col.name + "(" + dotName + ")" + "记录数";
+      // }
+      script[col.extra] = GetCount(col.extra);
+      chart[title] = {
+        bind: col.extra,
+        link: "/x/Table/" + dotName,
+        view: { type: "Number", props: { unit: "条" } },
+      };
+      columns.push({ name: title, width: 6 });
+    }
+  });
 
   dsl.layout.chart.columns = columns;
   dsl.fields.chart = chart;

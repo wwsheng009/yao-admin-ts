@@ -1,10 +1,10 @@
 import { FS, Process, Studio } from "yao-node-client";
 import { YaoFlow, YaoMenu, YaoModel } from "yao-app-ts-types";
 
-export function Create(modelDsl: YaoModel.ModelDSL[]) {
+export function Create(modelDsls: YaoModel.ModelDSL[]) {
   let insert = [] as YaoMenu.MenuItems;
   // let child = [];
-  const total = modelDsl.length;
+  // const total = modelDsls.length;
   insert.push({
     blocks: 0,
     icon: "icon-activity",
@@ -17,22 +17,20 @@ export function Create(modelDsl: YaoModel.ModelDSL[]) {
 
   const english = /^[A-Za-z0-9\._-]*$/;
 
-  for (let i = 0; i < modelDsl.length; i++) {
-    // }
-    // for (const i in modelDsl) {
-    // const element = modelDsl[i];
-    let tableName = modelDsl[i].table.name;
-    if (!english.test(tableName)) {
-      tableName = modelDsl[i].table.comment;
-    }
+  let insert2 = [] as YaoMenu.MenuItems;
 
+  for (let i = 0; i < modelDsls.length; i++) {
+    let tableName = modelDsls[i].table.name;
+    if (!english.test(tableName)) {
+      tableName = modelDsls[i].table.comment;
+    }
     // const trans = Studio("model.translate.translate", tableName);
     const dotName = Studio("model.file.DotName", tableName);
     const icon = GetIcon(tableName);
 
     let item: YaoMenu.MenuItem = {
-      name: modelDsl[i].table.comment,
-      path: "/x/Table/" + dotName, //转换后的
+      name: modelDsls[i].table.comment,
+      path: dotName, //"/x/Table/" + dotName, //转换后的
       icon: icon,
       rank: i + 1,
       status: "enabled",
@@ -42,19 +40,13 @@ export function Create(modelDsl: YaoModel.ModelDSL[]) {
       id: (i + 1) * 10,
       children: [],
     };
-    if (total >= 10) {
-      item.visible_menu = 1;
-      // child.push(item);
-      if (i == 0) {
-        item.icon = "icon-align-justify";
-        insert[1] = item;
-      } else {
-        insert[1]["children"].push(item);
-      }
-    } else {
-      insert.push(item);
-    }
+    insert2.push(item);
   }
+  // 创建看板
+  Studio("model.dashboard.Create", insert2);
+
+  insert2 = MakeTree(insert2);
+  insert.push(...insert2);
   // Studio("model.move.Mkdir", "flows");
   Studio("model.move.Mkdir", "flows/app");
   const fs = new FS("dsl");
@@ -85,15 +77,109 @@ export function Create(modelDsl: YaoModel.ModelDSL[]) {
   const json = JSON.stringify(dsl);
   // console.log(`create menu:/flows/app/menu.flow.json`);
   fs.WriteFile("/flows/app/menu.flow.json", json);
+}
 
-  // 创建看板
-  if (total >= 10) {
-    Studio("model.dashboard.Create", insert, 1);
-  } else {
-    Studio("model.dashboard.Create", insert, 2);
+/**
+ * 把菜单列表转换成树状结构
+ * @param menuItems 菜单列表
+ * @returns 结构化的菜单
+ */
+export function MakeTree(menuItems: YaoMenu.MenuItem[]) {
+  //a.b
+  //a.b.c
+  //a.b.c.d
+  const root: YaoMenu.MenuItem = { name: "", path: "", children: [] };
+  const map: { [key: string]: YaoMenu.MenuItem } = { "": root };
+
+  menuItems.forEach((item) => {
+    const parts = item.path.split(".");
+    let parent = root;
+
+    for (let i = 0; i < parts.length; i++) {
+      const key = parts.slice(0, i + 1).join(".");
+      let node = map[key];
+
+      if (!node) {
+        node = { name: "", path: key, children: [] };
+        map[key] = node;
+        parent.children.push(node);
+      }
+
+      parent = node;
+    }
+
+    parent.name = item.name;
+    parent.path = "/x/Table/" + item.path;
+    parent.icon = item.icon;
+    parent.rank = item.rank;
+    parent.status = item.status;
+    parent.extra = item.extra;
+    parent.visible_menu = item.visible_menu;
+    parent.id = item.id;
+  });
+
+  // console.log(root.children);
+
+  const data = compress(root.children, 1);
+  return data;
+}
+/**
+ * 优化菜单结构显示
+ * @param items 树状菜单结构
+ * @param level 层级
+ * @returns 优化后的菜单
+ */
+function compress(
+  items: YaoMenu.MenuItem[],
+  level: number
+): YaoMenu.MenuItem[] {
+  const newarray: YaoMenu.MenuItem[] = [];
+
+  for (const item of items) {
+    if (item.name === "") {
+      //第一级是左边的显示
+      if (level === 1) {
+        if (item.children && item.children.length > 0) {
+          const { name, path, icon, rank, status, visible_menu, id } =
+            item.children[0];
+          item.name = name;
+          item.path = path;
+          item.icon = icon;
+          item.rank = rank;
+          item.status = status;
+          item.visible_menu = visible_menu;
+          item.id = id + 1;
+        }
+
+        item.children = compress(item.children, level + 1);
+        newarray.push(item);
+        continue;
+      }
+    }
+    if (item.children.length > 0) {
+      // Use if-else statement instead of nesting if statements
+      item.children = compress(item.children, level + 1);
+      const { name, path, icon, rank, status, visible_menu, id } = item;
+      //层级2开始是antd的菜单结构，不能有重复的path。
+      if (level > 1) {
+        item.path += "_folder";
+      }
+      item.children.unshift({
+        name,
+        path,
+        icon,
+        rank: rank + 1,
+        status,
+        visible_menu,
+        id: id + 1,
+      });
+      newarray.push(item);
+    } else {
+      newarray.push(item);
+    }
   }
 
-  //Process("models.xiang.menu.insert", columns, insert);
+  return newarray;
 }
 
 /**yao studio run model.menu.icon user

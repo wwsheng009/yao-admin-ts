@@ -38,6 +38,16 @@ export function CreateFromFile() {
 
   Studio("model.ts.CreatTypes", modelDsls);
 }
+
+export function CreateMenuFromFile() {
+  const files = GetModelFnameList();
+  const fs = new FS("dsl");
+  const modelDsls = files.map((file) => {
+    return JSON.parse(fs.ReadFile("models/" + file));
+  });
+
+  Studio("model.menu.Create", modelDsls);
+}
 /**
  * create model from tables
  * yao studio run model.cmd.GetModelsFromDB
