@@ -567,11 +567,12 @@ function CreateListFile(rel: RelationShip) {
     return;
   }
 
+  //在列表显示中不需要显示外键
   modelDsl.columns = modelDsl.columns.filter(
     (col) => col.name !== excludeField
   );
 
-  let listDsl = Studio("model.colunm.toList", modelDsl); //这里有studio js读取操作
+  let listDsl = Studio("model.column.list.toList", modelDsl); //这里有studio js读取操作
   // let listJson = JSON.stringify(listDsl);
 
   // let fs = new FS("dsl");

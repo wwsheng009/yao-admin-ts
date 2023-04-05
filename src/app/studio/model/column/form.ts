@@ -1,6 +1,154 @@
-import { YaoModel } from "yao-app-ts-types";
+import { YaoForm, YaoModel } from "yao-app-ts-types";
 import { Studio } from "yao-node-client";
 import { FormDefinition, FieldColumn } from "../../types";
+
+export function toForm(modelDsl: YaoModel.ModelDSL) {
+  const copiedObject: YaoModel.ModelColumn[] = JSON.parse(
+    JSON.stringify(modelDsl.columns)
+  );
+  let columns = copiedObject || [];
+
+  const table_dot_name = Studio("model.file.DotName", modelDsl.table.name);
+
+  const actions = [
+    {
+      title: "切换全屏",
+      icon: "icon-maximize-2",
+      showWhenAdd: true,
+      showWhenView: true,
+      action: [
+        {
+          name: "Fullscreen",
+          type: "Form.fullscreen",
+          payload: {},
+        },
+      ],
+    },
+    {
+      title: "重新生成代码",
+      icon: "icon-layers",
+      showWhenAdd: true,
+      showWhenView: true,
+      action: [
+        {
+          name: "StudioModel",
+          type: "Studio.model",
+          payload: { method: "CreateOne", args: [table_dot_name] },
+        },
+        {
+          name: "Confirm",
+          type: "Common.confirm",
+          payload: {
+            title: "提示",
+            content: "处理完成",
+          },
+        },
+      ],
+    },
+    {
+      title: "返回",
+      icon: "icon-arrow-left",
+      showWhenAdd: true,
+      showWhenView: true,
+      action: [
+        {
+          name: "CloseModal",
+          type: "Common.closeModal",
+          payload: {},
+        },
+      ],
+    },
+    {
+      title: "保存",
+      icon: "icon-check",
+      style: "primary",
+      showWhenAdd: true,
+      action: [
+        {
+          name: "Submit",
+          type: "Form.submit",
+          payload: {},
+        },
+        {
+          name: "Back",
+          type: "Common.closeModal",
+          payload: {},
+        },
+      ],
+    },
+    {
+      icon: "icon-trash-2",
+      style: "danger",
+      title: "Delete",
+      action: [
+        {
+          name: "Confirm",
+          type: "Common.confirm",
+          payload: {
+            title: "提示",
+            content: "确认删除，删除后数据无法恢复？",
+          },
+        },
+        {
+          name: "Delete",
+          payload: {
+            model: table_dot_name,
+          },
+          type: "Form.delete",
+        },
+        {
+          name: "Back",
+          type: "Common.closeModal",
+          payload: {},
+        },
+      ],
+    },
+  ];
+
+  let tableTemplate: YaoForm.FormDSL = {
+    name: modelDsl.name || "表单",
+    action: {
+      bind: {
+        model: table_dot_name,
+        option: { withs: {} },
+      },
+    },
+    layout: {
+      primary: "id",
+      actions,
+      form: {
+        props: {},
+        sections: [
+          {
+            columns: [],
+          },
+        ],
+      },
+    },
+    fields: {
+      form: {},
+    },
+  };
+  columns = Studio("model.column.utils.MakeColumnOrder", columns);
+  columns.forEach((column) => {
+    let form: false | FormDefinition = Cast(column, modelDsl);
+    if (form) {
+      form.layout.forEach((tc) => {
+        tableTemplate.layout.form.sections[0].columns.push(tc);
+      });
+      form.fields.forEach((ft) => {
+        tableTemplate.fields.form[ft.name] = ft.component;
+      });
+    }
+  });
+  tableTemplate.action.bind.option.withs = Studio(
+    "model.relation.GetWiths",
+    modelDsl
+  );
+
+  tableTemplate = Studio("model.relation.List", tableTemplate, modelDsl);
+  return tableTemplate;
+}
 
 /**
  *根据模型定义生成Form定义
@@ -138,10 +286,6 @@ export function Cast(
 
   delete component.is_image;
   component = Studio("model.column.component.EditPropes", component, column);
-  if (column.name === "validations") {
-    console.log("validations");
-  }
-
   component = updateFormCompModelXgen(component, column, modelDsl);
 
   res.fields.push({

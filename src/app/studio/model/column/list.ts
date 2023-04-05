@@ -1,7 +1,53 @@
-import { YaoModel } from "yao-app-ts-types";
+import { YaoList, YaoModel } from "yao-app-ts-types";
 import { Studio } from "yao-node-client";
 import { FormDefinition, FieldColumn } from "../../types";
 
+export function toList(modelDsl: YaoModel.ModelDSL) {
+  const copiedObject: YaoModel.ModelColumn[] = JSON.parse(
+    JSON.stringify(modelDsl.columns)
+  );
+
+  let columns = copiedObject || [];
+
+  const table_dot_name = Studio("model.file.DotName", modelDsl.table.name);
+
+  let listTemplate: YaoList.ListDSL = {
+    name: modelDsl.name || "列表",
+    action: {
+      bind: {
+        table: table_dot_name,
+      },
+    },
+    layout: {
+      list: {
+        columns: [],
+      },
+    },
+    fields: {
+      list: {},
+    },
+  };
+
+  //并不知道谁会调用列表，
+  //不要显示外部关联ID
+  // columns = columns.filter((col) => !/_id$/i.test(col.name));
+
+  columns = Studio("model.column.utils.MakeColumnOrder", columns);
+
+  columns.forEach((column) => {
+    let form: false | FormDefinition = Cast(column, modelDsl);
+    if (form) {
+      form.layout.forEach((tc) => {
+        listTemplate.layout.list.columns.push(tc);
+      });
+      form.fields.forEach((c) => {
+        listTemplate.fields.list[c.name] = c.component;
+      });
+    }
+  });
+  // listTemplate.action.bind.option.withs = Studio("model.relation.GetWiths", modelDsl);
+  return listTemplate;
+}
 /**
  *根据模型定义生成Form定义
  * yao studio run model.column.list.Cast
@@ -48,7 +94,7 @@ export function Cast(
     },
   };
 
-  let width = 8;
+  let width = 6;
 
   const bind = name;
   if (column.type == "json") {
@@ -133,9 +179,6 @@ export function Cast(
 
   delete component.is_image;
   component = Studio("model.column.component.EditPropes", component, column);
-  if (column.name === "validations") {
-    console.log("validations");
-  }
 
   component = updateListCompFromModelXgen(component, column, modelDsl);
 
