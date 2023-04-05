@@ -1,5 +1,5 @@
 import { YaoModel } from "yao-app-ts-types";
-import { FS, Process, Studio } from "yao-node-client";
+import { FS, Studio } from "yao-node-client";
 
 /**
  * yao studio run model.cmd.Create
@@ -45,14 +45,14 @@ export function CreateFromFile() {
  */
 export function GetModelsFromDB() {
   const modelDsl: YaoModel.ModelDSL[] = Studio("model.schema.Relation");
-  const fs = new FS("dsl");
+  // const fs = new FS("dsl");
   for (const i in modelDsl) {
     let table_name = Studio("model.file.SlashName", modelDsl[i].table.name);
     const table_file_name = table_name + ".mod.json";
     const table = JSON.stringify(modelDsl[i]);
-    Studio("model.move.Move", "models", table_file_name);
+    Studio("model.file.MoveAndWrite", "models", table_file_name, table);
     //console.log(`create model:/models/"${table_file_name}.mod.json`);
-    fs.WriteFile("/models/" + table_file_name, table);
+    // fs.WriteFile("/models/" + table_file_name, table);
   }
   return modelDsl;
 }
@@ -133,11 +133,11 @@ export function CreateListByModel(modelDsl: YaoModel.ModelDSL) {
 
   let listFileName = tableName + ".list.json";
   let listDsl = Studio("model.colunm.toList", modelDsl); //这里有studio js读取操作
-  let listJson = JSON.stringify(listDsl);
+  // let listJson = JSON.stringify(listDsl);
 
-  let fs = new FS("dsl");
-  Studio("model.move.Move", "lists", listFileName);
-  fs.WriteFile("/lists/" + listFileName, listJson);
+  // let fs = new FS("dsl");
+  Studio("model.file.MoveAndWrite", "lists", listFileName, listDsl);
+  // fs.WriteFile("/lists/" + listFileName, listJson);
 }
 
 /**
@@ -187,6 +187,6 @@ export function CreateLoginDsl() {
       site: "https://yaoapps.com?from=yao-admin",
     },
   });
-  Studio("model.move.Move", "logins", fname);
-  fs.WriteFile("/logins/" + fname, table);
+  Studio("model.file.MoveAndWrite", "logins", fname, table);
+  // fs.WriteFile("/logins/" + fname, table);
 }

@@ -1,117 +1,4 @@
-import { YaoModel } from "yao-app-ts-types";
 import { FS } from "yao-node-client";
-import { FieldColumn } from "../types";
-
-// 根据图片组件更新组件类型,只查看
-export function File(
-  column: YaoModel.ModelColumn,
-  component: FieldColumn
-): FieldColumn {
-  var guard = [
-    "img",
-    "image",
-    "_pic",
-    "pic_",
-    "picture",
-    "oss",
-    "photo",
-    "icon",
-    "avatar",
-    "Img",
-    "logo",
-    "cover",
-    "url",
-    "gallery",
-    "pic",
-  ];
-  const name = column.name;
-  for (var i in guard) {
-    if (name.indexOf(guard[i]) != -1) {
-      var component: FieldColumn = {
-        bind: name,
-        view: {
-          type: "Image",
-          compute: "scripts.file.image.ImagesView",
-          props: {},
-        },
-        edit: {
-          type: "Upload",
-          compute: "Upload",
-          //compute: "scripts.file.image.ImagesEdit",
-          props: {
-            filetype: "image",
-            disabled: true,
-            $api: {
-              process: "fs.system.Upload",
-            },
-          },
-        },
-      };
-      return component;
-    }
-  }
-
-  return component;
-}
-
-/**
- * 根据图片组件更新组件类型,可上传
- * @param column 模型中的字段定义
- * @param component 数据库字段定义
- * @param modelDsl 模型引用
- * @returns
- */
-export function FormFile(
-  column: YaoModel.ModelColumn,
-  component: FieldColumn,
-  modelDsl: YaoModel.ModelDSL
-): FieldColumn {
-  var guard = [
-    "img",
-    "image",
-    "_pic",
-    "pic_",
-    "picture",
-    "oss",
-    "photo",
-    "icon",
-    "avatar",
-    "Img",
-    "logo",
-    "cover",
-    "url",
-    "gallery",
-    "pic",
-  ];
-  const name = column.name;
-  for (var i in guard) {
-    if (name.indexOf(guard[i]) != -1) {
-      var component: FieldColumn = {
-        is_image: true,
-        bind: name,
-        view: {
-          type: "Image",
-          compute: "scripts.file.image.ImagesView",
-          props: {},
-        },
-        edit: {
-          type: "Upload",
-          compute: {
-            process: "scripts.file.image.ImagesEdit",
-            args: ["$C(row)", "$C(type)", name, modelDsl.table.name],
-          },
-          props: {
-            filetype: "image",
-            $api: { process: "fs.system.Upload" },
-          },
-        },
-      };
-      return component;
-    }
-  }
-
-  return component;
-}
 
 /**
  * yao studio run model.file.DotName table_name
@@ -161,6 +48,23 @@ export function FileNameConvert(filename: string) {
   const header = arr.slice(0, -2);
   const str1 = header.join("/") + "." + suffix.join(".");
   return str1.replace(/\/\//g, "/");
+}
+
+/**
+ * 在scripts目录写入脚本内容
+ * @param fname 脚本名称
+ * @param scripts 脚本内容
+ */
+export function WriteScript(fname: string, scripts: string) {
+  let fs = new FS("script");
+
+  if (!fs.Exists(fname)) {
+    const folder = fname.split("/").slice(0, -1).join("/");
+    if (!fs.Exists(folder)) {
+      fs.MkdirAll(folder);
+    }
+  }
+  fs.WriteFile(fname, scripts);
 }
 // export function FileNameConvert(filename: string) {
 //   let str = filename;
@@ -216,3 +120,61 @@ export function WriteFile(filename: string, data: object) {
 //   // console.log("write file:", nfilename);
 //   fs.WriteFile(filename, JSON.stringify(data));
 // }
+
+/**
+ * yao studio run model.file.MoveAndWrite
+ * @param folder Yao应用目录，相对于Yao App根目录
+ * @param file
+ * @param data
+ */
+export function MoveAndWrite(folder: string, file: string, data: object) {
+  Move(folder, file);
+  WriteFile(`/${folder}/` + file, data);
+}
+
+/**
+ * yao studio run model.move.Move
+ * 文件复制移动逻辑
+ */
+export function Move(dir: string, name: string) {
+  const fs = new FS("dsl");
+  const base_dir = ".trash";
+
+  // 判断文件夹是否存在.不存在就创建
+  Mkdir(base_dir);
+  const new_dir = Math.floor(Date.now() / 1000);
+  // models的文件移动到
+  const target_name = dir + "/" + name;
+
+  // 如果已经存在
+  if (fs.Exists(dir + "/" + name)) {
+    Mkdir(base_dir + "/" + new_dir);
+    fs.Copy(target_name, `${base_dir}/${new_dir}/${name}`);
+    // 复制完成后,删除文件
+    fs.Remove(target_name);
+  } else {
+    return false;
+  }
+}
+export function Mkdir(name: string) {
+  const fs = new FS("dsl");
+  const res = fs.Exists(name);
+  if (res !== true) {
+    fs.MkdirAll(name);
+  }
+}
+
+export function Copy(from: string, to: string, name: string) {
+  const fs = new FS("dsl");
+  fs.Copy(from, to + "/" + name);
+}
+/**
+ * 查看模型是否存在
+ * @param {*} file_name
+ * @returns
+ */
+export function Exists(dir: string, file_name: string) {
+  const fs = new FS("dsl");
+  const res = fs.Exists(dir + "/" + file_name);
+  return res;
+}

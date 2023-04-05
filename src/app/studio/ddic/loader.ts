@@ -59,6 +59,7 @@ export function UpdateTableFromDsl(
     relations.push(UpdateRelationFromDsl(key, modelDsl.relations[key]));
   }
   model.relations = JSON.stringify(relations);
+
   return model;
 }
 
@@ -74,7 +75,8 @@ export function UpdateRelationFromDsl(
   let data = rel as unknown as ddic_model_relation;
 
   data.name = key;
-
+  //must do this in case xgen will dump
+  data.query = JSON.stringify(rel.query);
   return data;
 }
 

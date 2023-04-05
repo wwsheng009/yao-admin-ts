@@ -1,6 +1,7 @@
 import { FS } from "yao-node-client";
 
 /**
+ * yao studio run model.move.Move
  * 文件复制移动逻辑
  */
 export function Move(dir: string, name: string) {

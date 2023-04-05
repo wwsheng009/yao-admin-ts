@@ -26,7 +26,7 @@ export function Create(modelDsl: YaoModel.ModelDSL[]) {
       tableName = modelDsl[i].table.comment;
     }
 
-    // const trans = Studio("model.relation.translate", tableName);
+    // const trans = Studio("model.translate.translate", tableName);
     const dotName = Studio("model.file.DotName", tableName);
     const icon = GetIcon(tableName);
 

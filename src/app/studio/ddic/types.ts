@@ -138,12 +138,12 @@ export interface ddic_form {
   bind_option: string;
   /**表注释 */
   comment: string;
+  /** Relation: fields=> ddic.form.field */
+  fields?: ddic_form_field[];
   /** Relation: model=> ddic.model */
   model?: ddic_model;
   /** Relation: table=> ddic.table */
   table?: ddic_table;
-  /** Relation: fields=> ddic.form.field */
-  fields?: ddic_form_field[];
 }
 
 /**

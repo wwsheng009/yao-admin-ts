@@ -1,87 +1,6 @@
-import { log, Process, Studio } from "yao-node-client";
-import {
-  MapAny,
-  YaoComponent,
-  YaoForm,
-  YaoList,
-  YaoModel,
-  YaoTable,
-} from "yao-app-ts-types";
-import { FieldColumn, FormDefinition, TableDefinition } from "../types";
-
-/**
- * 数据库类型与控件类型对应字段
- * @returns
- */
-export function getType(): { [key: string]: YaoComponent.EditComponentEnum } {
-  return {
-    string: "Input",
-    char: "Input",
-    text: "TextArea",
-    mediumText: "TextArea",
-    longText: "TextArea",
-    date: "DatePicker",
-    datetime: "DatePicker",
-    datetimeTz: "DatePicker",
-    time: "DatePicker",
-    timeTz: "DatePicker",
-    timestamp: "DatePicker",
-    timestampTz: "DatePicker",
-    tinyInteger: "InputNumber",
-    tinyIncrements: "InputNumber",
-    unsignedTinyInteger: "InputNumber",
-    smallInteger: "InputNumber",
-    unsignedSmallInteger: "InputNumber",
-    integer: "InputNumber",
-    bigInteger: "InputNumber",
-    decimal: "InputNumber",
-    unsignedDecimal: "InputNumber",
-    float: "InputNumber",
-    boolean: "Input",
-    enum: "Select",
-  };
-}
-
-/**
- * 根据参数类型返回需要排除的字段列表
- * @param isTable true获取Table页面排除,false获取form布局排除字段
- * @returns 排除字段列表
- */
-export function Hidden(isTable: boolean) {
-  let hidden: string[] = [];
-  if (isTable) {
-    // Table页面不展示的字段列表
-    hidden = [
-      "secret",
-      "password",
-      "del",
-      "delete",
-      "deleted",
-      "deleted_at",
-      "pwd",
-      "deleted",
-    ];
-  } else {
-    // Form页面不展示的字段列表
-    hidden = [
-      "del",
-      "delete",
-      "deleted",
-      "deleted_at",
-      "created_at",
-      "updated_at",
-      "id",
-      "ID",
-      "update_time",
-      "password",
-      "pwd",
-    ];
-  }
-  return hidden;
-}
-export function filter() {
-  return ["name", "title", "_sn"];
-}
+import { Studio } from "yao-node-client";
+import { YaoForm, YaoList, YaoModel, YaoTable } from "yao-app-ts-types";
+import { FormDefinition, TableDefinition } from "../types";
 
 export function toList(modelDsl: YaoModel.ModelDSL) {
   const copiedObject: YaoModel.ModelColumn[] = JSON.parse(
@@ -116,18 +35,22 @@ export function toList(modelDsl: YaoModel.ModelDSL) {
   columns = MakeColumnOrder(columns);
 
   columns.forEach((column) => {
-    let col = castFormColumn(column, modelDsl, "list");
-    if (col) {
-      col.layout.forEach((tc) => {
+    let form: false | FormDefinition = Studio(
+      "model.column.list.Cast",
+      column,
+      modelDsl
+    );
+    if (form) {
+      form.layout.forEach((tc) => {
         listTemplate.layout.list.columns.push(tc);
       });
-      col.fields.forEach((c) => {
+      form.fields.forEach((c) => {
         // delete c.component.withs;
         listTemplate.fields.list[c.name] = c.component;
       });
     }
   });
-  // listTemplate.action.bind.option.withs = Studio("model.selector.GetWiths", modelDsl);
+  // listTemplate.action.bind.option.withs = Studio("model.relation.GetWiths", modelDsl);
   return listTemplate;
 }
 
@@ -241,12 +164,16 @@ export function toTable(modelDsl: YaoModel.ModelDSL) {
   columns = MakeColumnOrder(columns);
 
   columns.forEach((column) => {
-    let col = castTableColumn(column, modelDsl);
-    if (col) {
-      col.layout.table.columns.forEach((tc) => {
+    let table: false | TableDefinition = Studio(
+      "model.column.table.Cast",
+      column,
+      modelDsl
+    );
+    if (table) {
+      table.layout.table.columns.forEach((tc) => {
         tableTemplate.layout.table.columns.push(tc);
       });
-      col.fields.table.forEach((c) => {
+      table.fields.table.forEach((c) => {
         // let cop = c.component.withs || [];
         // cop.forEach((fct: { name: string }) => {
         //   tableTemplate.action.bind.option.withs[fct.name] = {};
@@ -255,293 +182,17 @@ export function toTable(modelDsl: YaoModel.ModelDSL) {
         tableTemplate.fields.table[c.name] = c.component;
       });
 
-      col.fields.filter.forEach((ff) => {
+      table.fields.filter.forEach((ff) => {
         tableTemplate.layout.filter.columns.push({ name: ff.name, width: 4 });
         tableTemplate.fields.filter[ff.name] = ff.component;
       });
     }
   });
   tableTemplate.action.bind.option.withs = Studio(
-    "model.selector.GetWiths",
+    "model.relation.GetWiths",
     modelDsl
   );
   return tableTemplate;
-}
-
-/**
- * 更新一些编辑属性
- * @param component
- * @param column
- */
-function updateViewSwitchPropes(
-  component: FieldColumn,
-  column: YaoModel.ModelColumn
-) {
-  if (!component.view) {
-    return;
-  }
-
-  if (column.type !== "Switch") {
-    return;
-  }
-  component.view.props = component.view.props || {};
-
-  const { unique, nullable, default: columnDefault, type } = column;
-
-  if (unique || (!columnDefault && !nullable)) {
-    component.view.props.itemProps = { rules: [{ required: true }] };
-  }
-
-  if (column.comment) {
-    component.view.props["itemProps"] = component.edit.props["itemProps"] || {};
-    component.view.props["itemProps"]["tooltip"] = column.comment;
-  }
-
-  if (column.default != null) {
-    const ismysql: boolean = Studio("model.utils.IsMysql");
-    const defaultValue =
-      ismysql && type === "Switch" ? (column.default ? 1 : 0) : column.default;
-
-    component.view.props["defaultValue"] = defaultValue;
-    component.view.props["value"] = defaultValue;
-  }
-}
-/**
- * 更新一些编辑属性
- * @param component
- * @param column
- */
-function updateEditPropes(
-  component: FieldColumn,
-  column: YaoModel.ModelColumn
-) {
-  if (!component.edit) {
-    return;
-  }
-  component.edit.props = component.edit.props || {};
-
-  const { unique, nullable, default: columnDefault, type } = column;
-
-  if (/^id$/i.test(type)) {
-    component.edit.props.itemProps = {};
-  } else if (unique || (columnDefault == null && !nullable)) {
-    //这里不要判断同时 == null || == undefined
-    component.edit.props.itemProps = { rules: [{ required: true }] };
-  }
-
-  if (column.comment) {
-    component.edit.props["itemProps"] = component.edit.props["itemProps"] || {};
-    component.edit.props["itemProps"]["tooltip"] = column.comment;
-  }
-
-  if (column.default != null) {
-    const ismysql: boolean = Studio("model.utils.IsMysql");
-    const defaultValue =
-      ismysql && type === "boolean" ? (column.default ? 1 : 0) : column.default;
-
-    component.edit.props["defaultValue"] = defaultValue;
-
-    if (["RadioGroup", "Select"].includes(column.type)) {
-      component.edit.props["value"] = defaultValue;
-    }
-
-    if (component.view && ["Switch"].includes(column.type)) {
-      component.view.props["value"] = defaultValue;
-    }
-  }
-}
-export function castTableColumn(
-  column: YaoModel.ModelColumn,
-  modelDsl: YaoModel.ModelDSL
-) {
-  // const props = column.props || {};
-  let title = column.label || column.name;
-  const name = column.name;
-
-  // 不展示隐藏列
-  let hidden = Hidden(true);
-  if (hidden.indexOf(name) != -1) {
-    // console.log("castTableColumn: hidden");
-    return false;
-  }
-  const typeMapping = getType();
-
-  if (!name) {
-    // console.log("castTableColumn: missing name");
-    log.Error("castTableColumn: missing name");
-    return false;
-  }
-
-  if (!title) {
-    // console.log("castTableColumn: missing title");
-    log.Error("castTableColumn: missing title");
-    return false;
-  }
-
-  let res = {
-    layout: {
-      filter: { columns: [] },
-      table: { columns: [] },
-    },
-    fields: {
-      filter: [],
-      table: [],
-    },
-  } as TableDefinition;
-
-  const bind = name;
-  let component = {
-    is_select: false,
-    bind: name,
-    view: { type: "Text", props: {} },
-    edit: {
-      type: "Input",
-      bind: bind,
-      props: {},
-    },
-  } as FieldColumn;
-
-  let width = 160;
-  if (title.length > 5) {
-    width = 250;
-  }
-
-  // 如果是json的,去看看是不是图片文件
-  if (column.type === "json") {
-    component = Studio("model.file.File", column, false);
-    if (!component) {
-      //可以再优化下
-      component = {
-        bind: bind,
-        view: {
-          compute: "scripts.ddic.compute.json.View",
-          props: {},
-          type: "Tooltip",
-        },
-        edit: {
-          props: {},
-          compute: "scripts.ddic.compute.json.Edit",
-          type: "TextArea",
-        },
-      };
-    }
-    // log.Error("castTableColumn: Type %s does not support", column.type);
-  } else if (column.type === "enum") {
-    component = {
-      bind: bind,
-      edit: {
-        props: {
-          options: Enum(column["option"]),
-          placeholder: "请选择" + title,
-        },
-        type: "Select",
-      },
-      view: {
-        props: {
-          options: Enum(column["option"]),
-          placeholder: "请选择" + title,
-        },
-        type: "Tag",
-      },
-    };
-  } else if (column.type === "boolean") {
-    let checkedValue: boolean | number = true;
-    let unCheckedValue: boolean | number = false;
-    const ismysql: boolean = Studio("model.utils.IsMysql");
-
-    if (ismysql) {
-      checkedValue = 1;
-      unCheckedValue = 0;
-    }
-    component = {
-      bind: bind,
-      view: {
-        type: "Switch",
-        props: {
-          checkedChildren: "是",
-          checkedValue: checkedValue,
-          unCheckedChildren: "否",
-          unCheckedValue: unCheckedValue,
-        },
-      },
-    };
-  } else if (/color/i.test(column.name)) {
-    component.edit.type = "ColorPicker";
-    width = 80;
-  } else if (column.crypt === "PASSWORD") {
-    component.edit.type = "Password";
-    width = 180;
-  } else {
-    if (column.type in typeMapping) {
-      component.edit.type = typeMapping[column.type];
-    }
-  }
-
-  //检查是否下拉框显示
-  component = Studio("model.selector.Select", column, modelDsl, component);
-  // 如果是下拉的,则增加查询条件
-  if (component.is_select) {
-    const where_bind = "where." + name + ".in";
-    res.fields.filter.push({
-      name: title,
-      component: {
-        bind: where_bind,
-        edit: component.edit,
-      },
-    });
-  } else {
-    const filter_target = filter();
-    for (const f in filter_target) {
-      if (name.indexOf(filter_target[f]) != -1) {
-        res.fields.filter.push({
-          name: title,
-          component: {
-            bind: "where." + name + ".match",
-            edit: {
-              type: "Input",
-              compute: "Trim",
-              props: { placeholder: "请输入" + title },
-            },
-          },
-        });
-      }
-    }
-  }
-  // component = Studio("model.file.File", column, component);
-  updateEditPropes(component, column);
-  updateViewSwitchPropes(component, column);
-  updateTableComponentFromModel(component, column, modelDsl);
-  if (
-    !component.view ||
-    !component.view?.props ||
-    !component.view?.props?.ddic_hide
-  ) {
-    res.layout.table.columns.push({
-      name: title,
-      width: width,
-    });
-  }
-
-  delete component.is_select;
-  res.fields.table.push({
-    name: title,
-    component: component,
-  });
-
-  return res;
-}
-
-/**
- * 把模型中的option定义转换成控件select option对象
- * @param option 选择列表
- * @returns
- */
-export function Enum(option: YaoModel.ColumnOption[]) {
-  let res = [];
-  for (const i in option) {
-    res.push({ label: "::" + option[i], value: option[i] });
-  }
-  return res;
 }
 
 export function toForm(modelDsl: YaoModel.ModelDSL) {
@@ -660,13 +311,17 @@ export function toForm(modelDsl: YaoModel.ModelDSL) {
   };
   columns = MakeColumnOrder(columns);
   columns.forEach((column) => {
-    let col = castFormColumn(column, modelDsl);
-    if (col) {
+    let form: false | FormDefinition = Studio(
+      "model.column.form.Cast",
+      column,
+      modelDsl
+    );
+    if (form) {
       // col.layout.filter.columns.forEach((fc) => {});
-      col.layout.forEach((tc) => {
+      form.layout.forEach((tc) => {
         tableTemplate.layout.form.sections[0].columns.push(tc);
       });
-      col.fields.forEach((ft) => {
+      form.fields.forEach((ft) => {
         // let cop = ft.component.withs || [];
         // cop.forEach((fct: { name: string | number }) => {
         //   tableTemplate.action.bind.option.withs[fct.name] = {};
@@ -678,16 +333,16 @@ export function toForm(modelDsl: YaoModel.ModelDSL) {
     }
   });
   tableTemplate.action.bind.option.withs = Studio(
-    "model.selector.GetWiths",
+    "model.relation.GetWiths",
     modelDsl
   );
 
-  tableTemplate = Studio("model.selector.List", tableTemplate, modelDsl);
+  tableTemplate = Studio("model.relation.List", tableTemplate, modelDsl);
   return tableTemplate;
 }
 
 export function MakeColumnOrder(columns: YaoModel.ModelColumn[]) {
-  const typeMapping = getType();
+  const typeMapping = Studio("model.column.component.GetTypes");
 
   let columns1: YaoModel.ModelColumn[] = [];
   let columns2: YaoModel.ModelColumn[] = [];
@@ -702,228 +357,4 @@ export function MakeColumnOrder(columns: YaoModel.ModelColumn[]) {
     }
   });
   return columns1.concat(columns2);
-}
-
-/**根据模型定义生成Form定义 */
-export function castFormColumn(
-  column: YaoModel.ModelColumn,
-  modelDsl: YaoModel.ModelDSL,
-  type: string = "form"
-) {
-  const types = getType();
-
-  const title = column.label || column.name;
-  const name = column.name;
-
-  if (!name) {
-    //log.Error("castFormColumn: missing name");
-    return false;
-  }
-
-  if (!title) {
-    // log.Error("castFormColumn: missing title");
-    return false;
-  }
-
-  // 不展示隐藏列
-  const hidden = Hidden(false);
-  if (hidden.indexOf(name) != -1) {
-    return false;
-  }
-
-  let res: FormDefinition = {
-    layout: [],
-    fields: [],
-  };
-
-  let component: FieldColumn = {
-    bind: name,
-    edit: {
-      type: "Input",
-      props: {},
-    },
-  };
-
-  let width = 8;
-
-  const bind = name;
-  if (column.type == "json") {
-    component = Studio("model.file.FormFile", column, false, modelDsl);
-    if (!component) {
-      component = {
-        bind: bind,
-        edit: {
-          props: {
-            language: "json",
-            height: 200,
-          },
-          compute: "scripts.ddic.compute.json.Edit",
-          type: "CodeEditor",
-        },
-      };
-    }
-  } else if (column.type == "enum") {
-    component = {
-      bind: bind,
-      edit: {
-        props: {
-          options: Enum(column["option"]),
-          placeholder: "请选择" + title,
-        },
-        type: "Select",
-      },
-    };
-  } else if (column.type === "boolean") {
-    const ismysql: boolean = Studio("model.utils.IsMysql");
-
-    let checkedValue: boolean | number = true;
-    let unCheckedValue: boolean | number = false;
-
-    if (ismysql) {
-      checkedValue = 1;
-      unCheckedValue = 0;
-    }
-    component = {
-      bind: bind,
-      edit: {
-        type: "RadioGroup", //RadioGroup是单选项，CheckboxGroup是多选项
-        props: {
-          options: [
-            {
-              label: "是",
-              value: checkedValue,
-            },
-            {
-              label: "否",
-              value: unCheckedValue,
-            },
-          ],
-        },
-      },
-    };
-  } else if (/color/i.test(column.name)) {
-    component.edit.type = "ColorPicker";
-  } else if (column.crypt === "PASSWORD") {
-    component.edit.type = "Password";
-  } else {
-    if (column.type in types) {
-      component.edit.type = types[column.type];
-    }
-  }
-
-  if (["TextArea"].includes(types[column.type]) || column.type === "json") {
-    width = 24;
-  }
-  component = Studio("model.selector.EditSelect", column, modelDsl, component);
-
-  component = Studio("model.file.FormFile", column, component, modelDsl);
-
-  if (component.is_image) {
-    width = 24;
-  }
-
-  res.layout.push({
-    name: title,
-    width: width,
-  });
-
-  delete component.is_image;
-  updateEditPropes(component, column);
-  if (type === "form") {
-    updateFormComponentFromModel(component, column, modelDsl);
-  } else if (type === "list") {
-    updateListComponentFromModel(component, column, modelDsl);
-  }
-
-  res.fields.push({
-    name: title,
-    component: component,
-  });
-
-  return res;
-}
-function updateFormComponentFromModel(
-  component: FieldColumn,
-  column: YaoModel.ModelColumn,
-  modelDsl: YaoModel.ModelDSL
-) {
-  return updateComponentFromModel(component, column, modelDsl, "form");
-}
-
-function updateTableComponentFromModel(
-  component: FieldColumn,
-  column: YaoModel.ModelColumn,
-  modelDsl: YaoModel.ModelDSL
-) {
-  return updateComponentFromModel(component, column, modelDsl, "table");
-}
-
-function updateListComponentFromModel(
-  component: FieldColumn,
-  column: YaoModel.ModelColumn,
-  modelDsl: YaoModel.ModelDSL
-) {
-  return updateComponentFromModel(component, column, modelDsl, "list");
-}
-
-function updateComponentFromModel(
-  component: FieldColumn,
-  column: YaoModel.ModelColumn,
-  modelDsl: YaoModel.ModelDSL,
-  type: string
-) {
-  if (
-    !component ||
-    !modelDsl ||
-    !modelDsl?.xgen ||
-    !(column.name in modelDsl?.xgen)
-  ) {
-    return;
-  }
-  const config = modelDsl?.xgen[column.name];
-  switch (type) {
-    case "form":
-      component.edit = mergeObjects(component.edit, config.form?.edit);
-      break;
-    case "table":
-      component.view = mergeObjects(component.view, config.table?.view);
-      component.edit = mergeObjects(component.edit, config.table?.edit);
-      break;
-    case "list":
-      component.edit = mergeObjects(component.edit, config.list?.edit);
-      break;
-    default:
-      break;
-  }
-}
-/**
- * 合并两个js对象，并返回新对象。
- * @param target 目标对象
- * @param source 源对象
- * @returns
- */
-function mergeObjects(target: MapAny, source: MapAny) {
-  if (
-    typeof target !== "object" ||
-    target == null || //mybe undefined
-    typeof source !== "object" ||
-    source == null //mybe undefined
-  ) {
-    return target;
-  }
-
-  for (let key in source) {
-    if (source.hasOwnProperty(key)) {
-      if (
-        target[key] &&
-        typeof target[key] === "object" &&
-        typeof source[key] === "object"
-      ) {
-        target[key] = mergeObjects(target[key], source[key]);
-      } else {
-        target[key] = source[key];
-      }
-    }
-  }
-  return target;
 }

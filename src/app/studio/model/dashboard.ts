@@ -7,12 +7,14 @@ import { FS, Query, Studio } from "yao-node-client";
  * @param type 类型，1是二级菜单，2是一级菜单
  */
 export function Create(menu_arr: YaoMenu.MenuItem[], type: number) {
-  const fs = new FS("dsl");
+  // const fs = new FS("dsl");
 
-  Studio("model.move.Move", "charts", "dashboard.chart.json");
-  let dsl = Dsl(menu_arr, type);
+  // Studio("model.move.Move", "charts", "dashboard.chart.json");
+  let dsl = ChartDsl(menu_arr, type);
   //console.log(`create dashboard:/charts/dashboard.chart.json"`);
-  fs.WriteFile("/charts/" + "dashboard.chart.json", JSON.stringify(dsl));
+  // fs.WriteFile("/charts/" + "dashboard.chart.json", JSON.stringify(dsl));
+
+  Studio("model.file.MoveAndWrite", "charts", "dashboard.chart.json", dsl);
 }
 /**
  * 根据菜单创建图表
@@ -20,7 +22,7 @@ export function Create(menu_arr: YaoMenu.MenuItem[], type: number) {
  * @param type 类型，1是二级菜单，2是一级菜单
  * @returns
  */
-export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
+export function ChartDsl(menu_arr: YaoMenu.MenuItem[], type: number) {
   let dsl: YaoChart.ChartDSL = {
     name: "数据图表",
     action: {
@@ -109,11 +111,14 @@ export function Dsl(menu_arr: YaoMenu.MenuItem[], type: number) {
 }
 export function WriteScript(datai: object) {
   let data = JSON.stringify(datai);
-  let sc = new FS("script");
+
+  // let sc = new FS("script");
   let scripts = `function Data() {
     return ${data}
   }`;
-  sc.WriteFile("/dashboard.js", scripts);
+  Studio("model.file.WriteScript", "dashboard.js", scripts);
+
+  // sc.WriteFile("/dashboard.js", scripts);
 }
 
 export function GetCount(model: string) {
