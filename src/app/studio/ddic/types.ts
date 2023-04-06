@@ -227,7 +227,7 @@ export interface ddic_model_relation {
   /**关联条件 */
   query?: string;
   /** Relation: model=> ddic.model */
-  model?: ddic_model;
+  model?: string;
 }
 
 /**
@@ -253,7 +253,7 @@ export interface ddic_model {
   /**增加创建，更新时间戳 */
   timestamps?: boolean;
   /**关联关系 */
-  relations?: string;
+  relations?: ddic_model_relation[];
   /** Relation: columns=> ddic.model.column */
   columns?: ddic_model_column[];
 }

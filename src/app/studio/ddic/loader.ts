@@ -52,13 +52,13 @@ export function UpdateTableFromDsl(
   model.columns = modelDsl.columns.map((item) => UpdateColumnFromDsl(item));
 
   if (modelDsl.relations) {
-    model.relations = "";
+    model.relations = [];
   }
   let relations: ddic_model_relation[] = [];
   for (const key in modelDsl.relations) {
     relations.push(UpdateRelationFromDsl(key, modelDsl.relations[key]));
   }
-  model.relations = JSON.stringify(relations);
+  model.relations = relations;
 
   return model;
 }
@@ -75,6 +75,7 @@ export function UpdateRelationFromDsl(
   let data = rel as unknown as ddic_model_relation;
 
   data.name = key;
+  data.model = rel.model;
   //must do this in case xgen will dump
   data.query = JSON.stringify(rel.query);
   return data;

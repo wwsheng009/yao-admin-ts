@@ -205,7 +205,7 @@ export function EditPropes(
           : 0
         : column.default;
 
-    component.edit.props.defaultValue = defaultValue;
+    component.edit.props.initialValues = defaultValue;
 
     if (["RadioGroup", "Select"].includes(component.edit.type)) {
       component.edit.props.value = defaultValue;
