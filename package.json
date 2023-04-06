@@ -23,6 +23,7 @@
   "author": "vincentwwsheng@gmail.com",
   "license": "MIT",
   "dependencies": {
+    "antd": "^5.4.0",
     "yao-app-ts-types": "workspace:*",
     "yao-node-client": "workspace:*",
     "yao-node-server": "^1.0.0",

@@ -26,26 +26,34 @@ export function IsMysql() {
  */
 export function MergeObject(target: MapAny, source: MapAny) {
   if (
+    target === null ||
+    target === undefined ||
     typeof target !== "object" ||
-    target == null || //mybe undefined
-    typeof source !== "object" ||
-    source == null //mybe undefined
+    source === null || //mybe undefined
+    source === undefined ||
+    typeof source !== "object"
   ) {
     return target;
   }
 
-  for (let key in source) {
-    if (source.hasOwnProperty(key)) {
+  for (const [key, value] of Object.entries(source)) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
       if (
         target[key] &&
         typeof target[key] === "object" &&
-        typeof source[key] === "object"
+        typeof value === "object" &&
+        !Array.isArray(value)
       ) {
-        target[key] = MergeObject(target[key], source[key]);
+        MergeObject(target[key], value);
+      } else if (Array.isArray(target[key]) && Array.isArray(value)) {
+        target[key].push(...value);
       } else {
-        target[key] = source[key];
+        target[key] = value;
       }
+    } else {
+      target[key] = value;
     }
   }
+
   return target;
 }

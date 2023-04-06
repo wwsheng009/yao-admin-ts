@@ -136,6 +136,33 @@ export function toTable(modelDsl: YaoModel.ModelDSL) {
     "model.relation.GetWiths",
     modelDsl
   );
+
+  tableTemplate = mergeTableTemplateFromModel(tableTemplate, modelDsl);
+
+  return tableTemplate;
+}
+
+function mergeTableTemplateFromModel(
+  tableTemplate: YaoTable.TableDSL,
+  modelDsl: YaoModel.ModelDSL
+) {
+  if (!modelDsl || !modelDsl?.xgen || !modelDsl?.xgen.form) {
+    return tableTemplate;
+  }
+
+  tableTemplate = Studio(
+    "model.utils.MergeObject",
+    tableTemplate,
+    modelDsl?.xgen.table
+  );
+  for (const key in tableTemplate.fields.table) {
+    const element = tableTemplate.fields.table[key];
+
+    if (element?.view?.props?.ddic_hide) {
+      delete tableTemplate.fields.table[key];
+    }
+  }
+
   return tableTemplate;
 }
 /**
@@ -305,11 +332,7 @@ export function Cast(
   component = Studio("model.column.component.EditPropes", component, column);
   component = updateViewSwitchPropes(component, column);
   component = updateCompFromModelXgen(component, column, modelDsl);
-  if (
-    !component.view ||
-    !component.view?.props ||
-    !component.view?.props?.ddic_hide
-  ) {
+  if (column.type !== "json" && !component.view?.props?.ddic_hide) {
     res.layout.table.columns.push({
       name: title,
       width: width,
@@ -334,7 +357,7 @@ function updateViewSwitchPropes(
   component: FieldColumn,
   column: YaoModel.ModelColumn
 ) {
-  if (!component.view) {
+  if (!component || !component?.view) {
     return component;
   }
 

@@ -148,6 +148,33 @@ export function toForm(modelDsl: YaoModel.ModelDSL) {
   formTemplate = updateReference(formTemplate, modelDsl);
 
   formTemplate = Studio("model.relation.List", formTemplate, modelDsl);
+
+  formTemplate = mergeFormTemplateFromModel(formTemplate, modelDsl);
+  return formTemplate;
+}
+
+function mergeFormTemplateFromModel(
+  formTemplate: YaoForm.FormDSL,
+  modelDsl: YaoModel.ModelDSL
+) {
+  if (!modelDsl || !modelDsl?.xgen || !modelDsl?.xgen.form) {
+    return formTemplate;
+  }
+
+  formTemplate = Studio(
+    "model.utils.MergeObject",
+    formTemplate,
+    modelDsl?.xgen.form
+  );
+
+  for (const key in formTemplate.fields.form) {
+    const element = formTemplate.fields.form[key];
+
+    if (element?.edit?.props?.ddic_hide) {
+      delete formTemplate.fields.form[key];
+    }
+  }
+
   return formTemplate;
 }
 
@@ -266,7 +293,6 @@ export function Cast(
             language: "json",
             height: 200,
           },
-          compute: "scripts.ddic.compute.json.Edit",
           type: "CodeEditor",
         },
       };
@@ -336,14 +362,15 @@ export function Cast(
     width = 24;
   }
 
-  res.layout.push({
-    name: title,
-    width: width,
-  });
-
   delete component.is_image;
   component = Studio("model.column.component.EditPropes", component, column);
   component = updateFormCompModelXgen(component, column, modelDsl);
+  if (!component.edit?.props?.ddic_hide) {
+    res.layout.push({
+      name: title,
+      width: width,
+    });
+  }
 
   res.fields.push({
     name: title,
