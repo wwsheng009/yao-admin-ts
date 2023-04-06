@@ -120,52 +120,36 @@ export function ModelXgen(
   const config = modelDsl?.xgen[column.name];
   switch (type) {
     case "form":
-      component.edit = mergeObjects(component.edit, config.form?.edit);
+      component.edit = Studio(
+        "model.utils.MergeObject",
+        component.edit,
+        config.form?.edit
+      );
       break;
     case "table":
-      component.view = mergeObjects(component.view, config.table?.view);
-      component.edit = mergeObjects(component.edit, config.table?.edit);
+      component.view = Studio(
+        "model.utils.MergeObject",
+        component.view,
+        config.table?.view
+      );
+      component.edit = Studio(
+        "model.utils.MergeObject",
+        component.edit,
+        config.table?.edit
+      );
       break;
     case "list":
-      component.edit = mergeObjects(component.edit, config.list?.edit);
+      component.edit = Studio(
+        "model.utils.MergeObject",
+        component.edit,
+        config.list?.edit
+      );
       break;
     default:
       break;
   }
   return component;
 }
-/**
- * 合并两个js对象，并返回新对象。
- * @param target 目标对象
- * @param source 源对象
- * @returns
- */
-function mergeObjects(target: MapAny, source: MapAny) {
-  if (
-    typeof target !== "object" ||
-    target == null || //mybe undefined
-    typeof source !== "object" ||
-    source == null //mybe undefined
-  ) {
-    return target;
-  }
-
-  for (let key in source) {
-    if (source.hasOwnProperty(key)) {
-      if (
-        target[key] &&
-        typeof target[key] === "object" &&
-        typeof source[key] === "object"
-      ) {
-        target[key] = mergeObjects(target[key], source[key]);
-      } else {
-        target[key] = source[key];
-      }
-    }
-  }
-  return target;
-}
-
 /**
  * yao run studio model.column.component.EditPropes
  * 更新一些编辑属性

@@ -105,7 +105,7 @@ export function toForm(modelDsl: YaoModel.ModelDSL) {
     },
   ];
 
-  let tableTemplate: YaoForm.FormDSL = {
+  let formTemplate: YaoForm.FormDSL = {
     name: modelDsl.name || "表单",
     action: {
       bind: {
@@ -134,20 +134,77 @@ export function toForm(modelDsl: YaoModel.ModelDSL) {
     let form: false | FormDefinition = Cast(column, modelDsl);
     if (form) {
       form.layout.forEach((tc) => {
-        tableTemplate.layout.form.sections[0].columns.push(tc);
+        formTemplate.layout.form.sections[0].columns.push(tc);
       });
       form.fields.forEach((ft) => {
-        tableTemplate.fields.form[ft.name] = ft.component;
+        formTemplate.fields.form[ft.name] = ft.component;
       });
     }
   });
-  tableTemplate.action.bind.option.withs = Studio(
+  formTemplate.action.bind.option.withs = Studio(
     "model.relation.GetWiths",
     modelDsl
   );
+  formTemplate = updateReference(formTemplate, modelDsl);
 
-  tableTemplate = Studio("model.relation.List", tableTemplate, modelDsl);
-  return tableTemplate;
+  formTemplate = Studio("model.relation.List", formTemplate, modelDsl);
+  return formTemplate;
+}
+
+function updateReference(
+  formTemplate: YaoForm.FormDSL,
+  modelDsl: YaoModel.ModelDSL
+) {
+  const hasCount = Object.values(modelDsl.relations).filter(
+    (rel) => rel.type === "hasOne"
+  ).length;
+
+  if (hasCount === 0) {
+    return formTemplate; // no need to modify the form if there are no 'hasOne' relations
+  }
+
+  formTemplate = Studio("model.utils.MergeObject", formTemplate, {
+    layout: {
+      form: {
+        props: {
+          reference: {},
+        },
+      },
+    },
+  });
+
+  const referenceContent: YaoForm.FloatContentItem[] = [];
+  for (const rel in modelDsl.relations) {
+    if (modelDsl.relations[rel].type === "hasOne") {
+      referenceContent.push({
+        name: modelDsl.relations[rel].label || rel,
+        payload: {
+          Form: {
+            type: "edit",
+            model: modelDsl.relations[rel].model,
+            id: `{{${modelDsl.relations[rel].foreign}}}`,
+          },
+        },
+      });
+    }
+  }
+
+  if (hasCount === 1) {
+    formTemplate.layout.form.props.reference.flatContent = {
+      name: referenceContent[0].name,
+      defaultOpen: false,
+      payload: {
+        Form: {
+          type: "edit",
+          model: referenceContent[0].payload.Form.model,
+          id: `${referenceContent[0].payload.Form.id}`,
+        },
+      },
+    };
+  } else {
+    formTemplate.layout.form.props.reference.floatContents = referenceContent;
+  }
+  return formTemplate;
 }
 
 /**

@@ -6,8 +6,8 @@
 // create dsls from data model dsl files
 import { CreateMenuFromFile, CreateFromFile } from "@/app/studio/model/cmd";
 
-// CreateFromFile();
-CreateMenuFromFile();
+CreateFromFile();
+// CreateMenuFromFile();
 
 import { LoadModelFromFile } from "@/app/studio/ddic/loader";
 
