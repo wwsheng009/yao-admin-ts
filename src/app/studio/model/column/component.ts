@@ -197,6 +197,7 @@ export function EditPropes(
 
   // 默认值
   if (column.default != null) {
+    component.edit.props.itemProps = component.edit.props.itemProps || {};
     const ismysql: boolean = Studio("model.utils.IsMysql");
     const defaultValue =
       ismysql && column.type === "boolean"
@@ -205,15 +206,15 @@ export function EditPropes(
           : 0
         : column.default;
 
-    component.edit.props.initialValues = defaultValue;
+    component.edit.props.itemProps.initialValue = defaultValue;
 
-    if (["RadioGroup", "Select"].includes(component.edit.type)) {
-      component.edit.props.value = defaultValue;
-    }
+    // if (["RadioGroup", "Select"].includes(component.edit.type)) {
+    //   component.edit.props.value = defaultValue;
+    // }
 
-    if (component.view && ["Switch"].includes(component.view.type)) {
-      component.view.props.value = defaultValue;
-    }
+    // if (component.view && ["Switch"].includes(component.view.type)) {
+    //   component.view.props.value = defaultValue;
+    // }
   }
   return component;
 }
@@ -259,6 +260,7 @@ function GetRules(column: YaoModel.ModelColumn): RuleObject[] {
   let rule: RuleObject = {};
 
   const {
+    index,
     unique,
     nullable,
     default: columnDefault,
@@ -281,17 +283,22 @@ function GetRules(column: YaoModel.ModelColumn): RuleObject[] {
       rule.max = column.length;
     }
   }
-
   if (
-    !/^id$/i.test(dbColumnType) ||
-    unique ||
-    ((columnDefault === null || columnDefault === undefined) && !nullable)
+    !/^id$/i.test(dbColumnType) &&
+    (index ||
+      unique ||
+      ((columnDefault === null || columnDefault === undefined) && !nullable))
   ) {
     rule.required = true;
   }
 
   const validations = column.validations;
-  if (!validations || !validations.length) return rules;
+  if (!validations || !validations.length) {
+    if (rule?.type?.length > 0 || rule.required) {
+      rules.push(rule);
+    }
+    return rules;
+  }
 
   validations.forEach((validation) => {
     switch (validation.method) {
@@ -329,7 +336,7 @@ function GetRules(column: YaoModel.ModelColumn): RuleObject[] {
     }
   });
 
-  if (rule.type.length > 0 || rule.required) {
+  if (rule?.type?.length > 0 || rule.required) {
     rules.push(rule);
   }
 

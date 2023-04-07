@@ -6,14 +6,14 @@
 // create dsls from data model dsl files
 import { CreateMenuFromFile, CreateFromFile } from "@/app/studio/model/cmd";
 
-// CreateFromFile();
+CreateFromFile();
 // CreateMenuFromFile();
 
 import { LoadModelFromFile } from "@/app/studio/ddic/loader";
 
 // load model data to database
 //yao studio run ddic.loader.LoadModelFromFile
-LoadModelFromFile();
+// LoadModelFromFile();
 
 // create ts type from models
 // import { CreateModelTypes } from "@/app/studio/model/ts";

@@ -207,7 +207,7 @@ function updateReference(
         name: modelDsl.relations[rel].label || rel,
         payload: {
           Form: {
-            type: "edit",
+            type: "view",
             model: modelDsl.relations[rel].model,
             id: `{{${modelDsl.relations[rel].foreign}}}`,
           },
@@ -222,7 +222,7 @@ function updateReference(
       defaultOpen: false,
       payload: {
         Form: {
-          type: "edit",
+          type: "view",
           model: referenceContent[0].payload.Form.model,
           id: `${referenceContent[0].payload.Form.id}`,
         },
