@@ -185,7 +185,7 @@ export function Cast(
     // console.log("castTableColumn: hidden");
     return false;
   }
-  const typeMapping = Studio("model.column.component.GetTypes");
+  const typeMapping = Studio("model.column.component.GetDBTypeMap");
 
   if (!name) {
     // console.log("castTableColumn: missing name");
@@ -393,7 +393,7 @@ function updateCompFromModelXgen(
   modelDsl: YaoModel.ModelDSL
 ) {
   return Studio(
-    "model.column.component.ModelXgen",
+    "model.column.component.UpdateModelXgenComp",
     component,
     column,
     modelDsl,

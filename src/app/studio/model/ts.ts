@@ -16,7 +16,7 @@ export function CreateModelTypes(type: string = "ddic") {
   CreatTypes(modelDsl);
 }
 export function CreatTypes(models: YaoModel.ModelDSL[]) {
-  const typeMapping = getTypes();
+  const typeMapping = getTSTypeMapping();
 
   const codes = models.map((model) => {
     const tabName = model.table.name;
@@ -89,7 +89,7 @@ function getTsType(
   }
   return type;
 }
-function getTypes() {
+function getTSTypeMapping() {
   return {
     ID: "number",
     string: "string",

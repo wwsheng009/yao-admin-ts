@@ -7,20 +7,20 @@ import { Studio } from "yao-node-client";
  * @returns 排序后的数据列
  */
 export function MakeColumnOrder(columns: YaoModel.ModelColumn[]) {
-  const typeMapping = Studio("model.column.component.GetTypes");
+  const typeMapping = Studio("model.column.component.GetDBTypeMap");
 
-  let columns1: YaoModel.ModelColumn[] = [];
+  let columnsBefore: YaoModel.ModelColumn[] = [];
   //json或是textarea控件放在最后
-  let columns2: YaoModel.ModelColumn[] = [];
+  let columnsAfter: YaoModel.ModelColumn[] = [];
   columns.forEach((column) => {
     if (
       ["TextArea"].includes(typeMapping[column.type]) ||
       column.type === "json"
     ) {
-      columns2.push(column);
+      columnsAfter.push(column);
     } else {
-      columns1.push(column);
+      columnsBefore.push(column);
     }
   });
-  return columns1.concat(columns2);
+  return columnsBefore.concat(columnsAfter);
 }

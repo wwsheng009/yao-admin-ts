@@ -246,7 +246,7 @@ export function Cast(
   column: YaoModel.ModelColumn,
   modelDsl: YaoModel.ModelDSL
 ): false | FormDefinition {
-  const types = Studio("model.column.component.GetTypes");
+  const types = Studio("model.column.component.GetDBTypeMap");
 
   const title = column.label || column.name;
   const name = column.name;
@@ -386,7 +386,7 @@ function updateFormCompModelXgen(
   modelDsl: YaoModel.ModelDSL
 ) {
   return Studio(
-    "model.column.component.ModelXgen",
+    "model.column.component.UpdateModelXgenComp",
     component,
     column,
     modelDsl,

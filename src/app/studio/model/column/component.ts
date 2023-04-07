@@ -1,19 +1,15 @@
-import {
-  YaoModel,
-  MapAny,
-  YaoComponent,
-  YaoForm,
-  MapStr,
-} from "yao-app-ts-types";
+import { YaoModel, YaoComponent } from "yao-app-ts-types";
 import { FieldColumn } from "../../types";
 import { Studio } from "yao-node-client";
-import { RuleObject } from "antd/es/form";
+import { RuleObject } from "yao-app-ts-types/src/types/dsl/antd/rule";
 /**
  * 数据库类型与控件类型对应字段
- * yao studio run model.column.component.GetTypes
+ * yao studio run model.column.component.GetDBTypeMap
  * @returns
  */
-export function GetTypes(): { [key: string]: YaoComponent.EditComponentEnum } {
+export function GetDBTypeMap(): {
+  [key: string]: YaoComponent.EditComponentEnum;
+} {
   return {
     string: "Input",
     char: "Input",
@@ -101,15 +97,16 @@ export function Enum(option: YaoModel.ColumnOption[]) {
   return res;
 }
 /**
+ * 更新model xgen 设置中的组件设置
  *updateComponentFromModel
- * yao studio run model.column.component.ModelXgen
+ * yao studio run model.column.component.UpdateModelXgenComp
  * @param component 更新组件
  * @param column 模型定义列
  * @param modelDsl 模型定义
  * @param type 更新类型
  * @returns
  */
-export function ModelXgen(
+export function UpdateModelXgenComp(
   component: FieldColumn,
   column: YaoModel.ModelColumn,
   modelDsl: YaoModel.ModelDSL,
