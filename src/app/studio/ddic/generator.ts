@@ -33,9 +33,11 @@ export function DBModelToYaoModel(model_ddic: ddic_model): YaoModel.ModelDSL {
     model.table.name = model_ddic.table_name;
   }
   if (!model.table.name) {
-    model.table.name = Process("model.file.UnderscoreName", model.name);
+    model.table.name = Studio("model.file.UnderscoreName", model.name);
   }
-
+  if (!model.table.comment) {
+    model.table.comment = model.comment;
+  }
   if (model_ddic.table_comment != null) {
     model.table.comment = model_ddic.table_comment;
   }
@@ -48,40 +50,32 @@ export function DBModelToYaoModel(model_ddic: ddic_model): YaoModel.ModelDSL {
     model.option.timestamps = model_ddic.timestamps ? true : false;
   }
 
-  model_ddic.relations.forEach((rel) => {
+  model_ddic.relations?.forEach((rel) => {
     model.relations[rel.name] = rel as YaoModel.Relation;
     model.relations[rel.name].query = JSON.parse(rel.query);
   });
 
-  model_ddic.columns.forEach((col) => {
+  model_ddic.columns?.forEach((col) => {
     delete col.id;
     delete col.model_id;
-    if (col.index != null) {
-      col.index = col.index ? true : false;
-    }
-    if (col.nullable != null) {
-      col.nullable = col.nullable ? true : false;
-    }
+
+    ["index", "nullable", "unique"].forEach((key) => {
+      if (col[key] != null) {
+        col[key] = col[key] ? true : false;
+      }
+    });
+
     let col1 = col as YaoModel.ModelColumn;
 
     if (col.element_id) {
       col.element = Process("models.ddic.element.Find", col.element_id, {});
 
-      if (!col.type && col.element.type) {
-        col.type = col.element.type;
-      }
-      if (!col.length && col.element.length) {
-        col.length = col.element.length;
-      }
-      if (!col.scale && col.element.scale) {
-        col.scale = col.element.scale;
-      }
-      if (!col.precision && col.element.precision) {
-        col.precision = col.element.precision;
-      }
-      if (!col.comment && col.element.comment) {
-        col.comment = col.element.comment;
-      }
+      ["type", "length", "scale", "precision", "comment"].forEach((field) => {
+        if (!col[field] && col.element[field]) {
+          col[field] = col.element[field];
+        }
+      });
+
       col1.validations = col.element?.validations;
       if (col.element?.options) {
         col1.option = [];

@@ -80,6 +80,11 @@ export function UpdateColumnFromDsl(
     let element: ddic_element = {
       name: model.name + "_" + modelCol.name,
     };
+    element.type = modelCol.type;
+    element.comment = modelCol.comment;
+    element.length = modelCol.length;
+    element.precision = modelCol.precision;
+    element.scale = modelCol.scale;
 
     element.options = modelCol.option?.map((item) => {
       return { label: item, value: item };

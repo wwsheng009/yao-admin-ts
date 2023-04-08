@@ -58,6 +58,7 @@ export function CreatTypes(models: YaoModel.ModelDSL[]) {
     }
   */
   export interface ${last} {
+    [key: string]: any;
 ${fields}
 ${rels.join("\n")}
   }

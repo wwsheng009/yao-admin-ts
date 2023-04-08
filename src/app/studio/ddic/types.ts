@@ -4,6 +4,7 @@
  * Table=> ddic_domain (域)
  */
 export interface ddic_domain {
+  [key: string]: any;
   /**标识 */
   id?: number;
   /**undefined */
@@ -17,7 +18,7 @@ export interface ddic_domain {
   /**字段小数位位数，对float、decimal等类型字段有效 */
   scale?: number;
   /**字段的可选项，对enum类型字段有效 */
-  options?: string;
+  options?: any[];
 }
 
 /**
@@ -26,6 +27,7 @@ export interface ddic_domain {
  * Table=> ddic_element (数据元素)
  */
 export interface ddic_element {
+  [key: string]: any;
   /**标识 */
   id?: number;
   /**undefined */
@@ -36,14 +38,14 @@ export interface ddic_element {
   length?: number;
   /**位数(含小数位)，对float、decimal类型字段有效 */
   precision?: number;
-  /**备注 */
-  comment?: string;
   /**字段小数位位数，对float、decimal类型字段有效 */
   scale?: number;
   /**字段的可选项，对enum类型字段有效 */
   options?: any[];
   /**字段校验规则 */
   validations?: any[];
+  /**数据元素注释 */
+  comment?: string;
 }
 
 /**
@@ -52,6 +54,7 @@ export interface ddic_element {
  * Table=> ddic_form_action (表单动作)
  */
 export interface ddic_form_action {
+  [key: string]: any;
   /**表名 */
   id?: number;
   /**字段所属的表单 */
@@ -67,7 +70,7 @@ export interface ddic_form_action {
   /**表单修改数据时显示 */
   showWhenView?: boolean;
   /**Action列表 */
-  action: string;
+  action: any[];
   /** Relation: form=> ddic.form */
   form?: ddic_form;
 }
@@ -78,6 +81,7 @@ export interface ddic_form_action {
  * Table=> ddic_form_field (表单字段列表)
  */
 export interface ddic_form_field {
+  [key: string]: any;
   /**表名 */
   id?: number;
   /**字段所属的表单 */
@@ -89,11 +93,11 @@ export interface ddic_form_field {
   /**编辑控件类型 */
   edit_type: string;
   /**编辑控件属性 */
-  edit_props: string;
+  edit_props: any[];
   /**查看控件类型 */
   view_type: string;
   /**查看控件属性 */
-  view_props: string;
+  view_props: any[];
   /**字段介绍 */
   description: string;
   /**字段显示长度 */
@@ -101,7 +105,7 @@ export interface ddic_form_field {
   /**字段是否是否必输 */
   required?: boolean;
   /**字段许可值 */
-  option: string;
+  option: any[];
   /**启用 */
   enable?: boolean;
   /**字段默认值 */
@@ -118,6 +122,7 @@ export interface ddic_form_field {
  * Table=> ddic_form (表单定义)
  */
 export interface ddic_form {
+  [key: string]: any;
   /**标识 */
   id?: number;
   /**undefined */
@@ -129,15 +134,15 @@ export interface ddic_form {
   /**表单关联的表格 */
   table_id?: number;
   /**绑定模型选项 */
-  bind_option: string;
+  bind_option: any[];
   /**表注释 */
   comment: string;
-  /** Relation: fields=> ddic.form.field */
-  fields?: ddic_form_field[];
   /** Relation: model=> ddic.model */
   model?: ddic_model;
   /** Relation: table=> ddic.table */
   table?: ddic_table;
+  /** Relation: fields=> ddic.form.field */
+  fields?: ddic_form_field[];
 }
 
 /**
@@ -146,6 +151,7 @@ export interface ddic_form {
  * Table=> ddic_model_column_type (模型数据类型)
  */
 export interface ddic_model_column_type {
+  [key: string]: any;
   /**标识 */
   id?: number;
   /**undefined */
@@ -162,6 +168,7 @@ export interface ddic_model_column_type {
  * Table=> ddic_model_column (模型字段列表)
  */
 export interface ddic_model_column {
+  [key: string]: any;
   /**标识 */
   id?: number;
   /**字段所属的模型 */
@@ -192,10 +199,10 @@ export interface ddic_model_column {
   default?: string;
   /**注释，comment */
   comment?: string;
-  /** Relation: element=> ddic.element */
-  element?: ddic_element;
   /** Relation: model=> ddic.model */
   model?: ddic_model;
+  /** Relation: element=> ddic.element */
+  element?: ddic_element;
 }
 
 /**
@@ -204,6 +211,7 @@ export interface ddic_model_column {
  * Table=> ddic_model_relation (模型关联关系)
  */
 export interface ddic_model_relation {
+  [key: string]: any;
   /**表名 */
   id?: number;
   /**定义关系名称 */
@@ -228,6 +236,7 @@ export interface ddic_model_relation {
  * Table=> ddic_model (业务模型)
  */
 export interface ddic_model {
+  [key: string]: any;
   /**表名 */
   id?: number;
   /**undefined */
@@ -243,7 +252,7 @@ export interface ddic_model {
   /**增加创建，更新时间戳timestamps */
   timestamps?: boolean;
   /**关联关系 */
-  relations?: ddic_model_relation[];
+  relations?: any[];
   /** Relation: columns=> ddic.model.column */
   columns?: ddic_model_column[];
 }
@@ -254,6 +263,7 @@ export interface ddic_model {
  * Table=> ddic_table_action (表格动作)
  */
 export interface ddic_table_action {
+  [key: string]: any;
   /**表名 */
   id?: number;
   /**字段所属的表格 */
@@ -269,7 +279,7 @@ export interface ddic_table_action {
   /**表单修改数据时显示 */
   showWhenView?: boolean;
   /**Action列表 */
-  action: string;
+  action: any[];
   /** Relation: form=> ddic.form */
   form?: ddic_form;
 }
@@ -280,6 +290,7 @@ export interface ddic_table_action {
  * Table=> ddic_table_field (表格字段列表)
  */
 export interface ddic_table_field {
+  [key: string]: any;
   /**表名 */
   id?: number;
   /**字段所属的表格 */
@@ -291,17 +302,17 @@ export interface ddic_table_field {
   /**编辑控件类型 */
   edit_type: string;
   /**编辑控件属性 */
-  edit_props: string;
+  edit_props: any[];
   /**查看控件类型 */
   view_type: string;
   /**查看控件属性 */
-  view_props: string;
+  view_props: any[];
   /**字段显示长度 */
   width: number;
   /**字段是否是否必输 */
   required?: boolean;
   /**字段许可值 */
-  option: string;
+  option: any[];
   /**字段默认值 */
   default: string;
   /**启用 */
@@ -320,6 +331,7 @@ export interface ddic_table_field {
  * Table=> ddic_table_filter (表格筛选字段列表)
  */
 export interface ddic_table_filter {
+  [key: string]: any;
   /**表名 */
   id?: number;
   /**字段所属的表格 */
@@ -331,17 +343,17 @@ export interface ddic_table_filter {
   /**编辑控件类型 */
   edit_type: string;
   /**编辑控件属性 */
-  edit_props: string;
+  edit_props: any[];
   /**查看控件类型 */
   view_type: string;
   /**查看控件属性 */
-  view_props: string;
+  view_props: any[];
   /**字段显示长度 */
   width: number;
   /**字段是否是否必输 */
   required?: boolean;
   /**字段许可值 */
-  option: string;
+  option: any[];
   /**字段默认值 */
   default: string;
   /**启用 */
@@ -360,6 +372,7 @@ export interface ddic_table_filter {
  * Table=> ddic_table (表格定义)
  */
 export interface ddic_table {
+  [key: string]: any;
   /**表名 */
   id?: number;
   /**undefined */
@@ -372,12 +385,12 @@ export interface ddic_table {
   comment: string;
   /**介绍 */
   description: string;
-  /** Relation: form=> ddic.form */
-  form?: ddic_form;
   /** Relation: fields=> ddic.table.field */
   fields?: ddic_table_field[];
   /** Relation: model=> ddic.model */
   model?: ddic_model;
+  /** Relation: form=> ddic.form */
+  form?: ddic_form;
 }
 
 /**
@@ -386,6 +399,7 @@ export interface ddic_table {
  * Table=> demo_pet (宠物表)
  */
 export interface demo_pet {
+  [key: string]: any;
   /**undefined */
   id?: number;
   /**undefined */
@@ -405,5 +419,18 @@ export interface demo_pet {
   /**undefined */
   cost: number;
   /**undefined */
-  images?: string;
+  images?: any[];
+}
+
+/**
+ * Model=> demo.supplier (demo.supplier)
+ *
+ * Table=> demo_supplier (供应商表)
+ */
+export interface demo_supplier {
+  [key: string]: any;
+  /**主键 */
+  id?: number;
+  /**undefined */
+  name: string;
 }
