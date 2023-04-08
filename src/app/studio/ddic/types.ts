@@ -36,6 +36,8 @@ export interface ddic_element {
   length?: number;
   /**位数(含小数位)，对float、decimal类型字段有效 */
   precision?: number;
+  /**备注 */
+  comment?: string;
   /**字段小数位位数，对float、decimal类型字段有效 */
   scale?: number;
   /**字段的可选项，对enum类型字段有效 */

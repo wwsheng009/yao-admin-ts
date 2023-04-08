@@ -32,6 +32,9 @@ export function DBModelToYaoModel(model_ddic: ddic_model): YaoModel.ModelDSL {
   if (model_ddic.table_name != null) {
     model.table.name = model_ddic.table_name;
   }
+  if (!model.table.name) {
+    model.table.name = Process("model.file.UnderscoreName", model.name);
+  }
 
   if (model_ddic.table_comment != null) {
     model.table.comment = model_ddic.table_comment;
@@ -63,6 +66,22 @@ export function DBModelToYaoModel(model_ddic: ddic_model): YaoModel.ModelDSL {
 
     if (col.element_id) {
       col.element = Process("models.ddic.element.Find", col.element_id, {});
+
+      if (!col.type && col.element.type) {
+        col.type = col.element.type;
+      }
+      if (!col.length && col.element.length) {
+        col.length = col.element.length;
+      }
+      if (!col.scale && col.element.scale) {
+        col.scale = col.element.scale;
+      }
+      if (!col.precision && col.element.precision) {
+        col.precision = col.element.precision;
+      }
+      if (!col.comment && col.element.comment) {
+        col.comment = col.element.comment;
+      }
       col1.validations = col.element?.validations;
       if (col.element?.options) {
         col1.option = [];
