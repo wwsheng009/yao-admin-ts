@@ -1,4 +1,9 @@
-import { ddic_model, ddic_model_column, ddic_model_relation } from "./types";
+import {
+  ddic_element,
+  ddic_model,
+  ddic_model_column,
+  ddic_model_relation,
+} from "./types";
 import { MapAny, YaoModel } from "yao-app-ts-types";
 import { FS, Process, Studio } from "yao-node-client";
 
@@ -38,22 +43,25 @@ export function UpdateTableFromDsl(
   let tableName: string = Studio("model.file.DotName", modelDsl.table.name);
 
   model.table_name = tableName.replaceAll(".", "_");
-  model.model_comment = modelDsl.comment;
+  model.comment = modelDsl.comment;
   model.table_comment = modelDsl.table?.comment;
 
   let dots = tableName.split(".");
   dots.pop();
-  model.namespace = dots.join(".");
   model.name = tableName;
 
   model.soft_deletes = modelDsl.option?.soft_deletes ? true : false;
   model.timestamps = modelDsl.option?.timestamps ? true : false;
 
-  model.columns = modelDsl.columns.map((item) => UpdateColumnFromDsl(item));
+  model.columns = modelDsl.columns.map((item) =>
+    UpdateColumnFromDsl(model, item)
+  );
 
+  //关联关系
   if (modelDsl.relations) {
     model.relations = [];
   }
+
   let relations: ddic_model_relation[] = [];
   for (const key in modelDsl.relations) {
     relations.push(UpdateRelationFromDsl(key, modelDsl.relations[key]));
@@ -64,10 +72,42 @@ export function UpdateTableFromDsl(
 }
 
 export function UpdateColumnFromDsl(
-  modeCol: YaoModel.ModelColumn
+  model: ddic_model,
+  modelCol: YaoModel.ModelColumn
 ): ddic_model_column {
-  return modeCol as unknown as ddic_model_column;
+  let col = modelCol as ddic_model_column;
+  if (modelCol.option || modelCol.validations) {
+    let element: ddic_element = {
+      name: model.name + "_" + modelCol.name,
+    };
+
+    element.options = modelCol.option?.map((item) => {
+      return { label: item, value: item };
+    });
+    element.validations = modelCol.validations;
+
+    //查找是否存在相同的对象
+    const { data }: { data: ddic_element } = Process(
+      "models.ddic.element.Paginate",
+      {
+        wheres: [{ column: "name", value: element.name }],
+        with: {},
+      },
+      1,
+      1
+    );
+    let id = data?.id;
+
+    let data1: ddic_element = {
+      id,
+      ...element,
+    };
+    id = Process("models.ddic.element.Save", data1);
+    col.element_id = id;
+  }
+  return col;
 }
+
 export function UpdateRelationFromDsl(
   key: string,
   rel: YaoModel.Relation

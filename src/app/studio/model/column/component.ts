@@ -178,7 +178,7 @@ export function EditPropes(
     component.edit.props.itemProps = component.edit.props.itemProps || {};
     component.edit.props.itemProps.tooltip = column.comment;
   }
-  const rules = GetRules(column);
+  const rules = GetRules(column, component);
   if (rules?.length) {
     component.edit.props.itemProps = {
       ...component.edit.props.itemProps,
@@ -216,7 +216,10 @@ export function EditPropes(
   return component;
 }
 
-function GetRules(column: YaoModel.ModelColumn): RuleObject[] {
+function GetRules(
+  column: YaoModel.ModelColumn,
+  component: YaoComponent.EditComponentDSL
+): RuleObject[] {
   const validationTypeMap: { [key: string]: string } = {
     string: "string",
     integer: "integer",
@@ -271,6 +274,11 @@ function GetRules(column: YaoModel.ModelColumn): RuleObject[] {
     ) {
       rule.type = antdType;
       rule.enum = column.option;
+    } else if (
+      antdType === "boolean" &&
+      ["RadioGroup", "Switch", "Select"].includes(component.type)
+    ) {
+      //控件值跟数据库有关,不能使用boolean类型验证
     } else if (antdType) {
       rule.type = antdType as any;
     }

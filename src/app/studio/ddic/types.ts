@@ -8,7 +8,7 @@ export interface ddic_domain {
   id?: number;
   /**undefined */
   name: string;
-  /**字段类型定义 */
+  /**数据类型定义 */
   type?: string;
   /**字段长度，对string等类型字段有效 */
   length?: number;
@@ -18,8 +18,6 @@ export interface ddic_domain {
   scale?: number;
   /**字段的可选项，对enum类型字段有效 */
   options?: string;
-  /**字段校验规则 */
-  validations?: string;
 }
 
 /**
@@ -32,24 +30,18 @@ export interface ddic_element {
   id?: number;
   /**undefined */
   name: string;
-  /**域定义 */
-  domain_id?: number;
-  /**字段类型定义 */
+  /**数据类型定义 */
   type?: string;
-  /**字段长度，对 `string` 等类型字段有效 */
+  /**字段长度，对文本类型字段有效 */
   length?: number;
-  /**字段位数(含小数位)，对 `float`、`decimal` 等类型字段有效 */
+  /**位数(含小数位)，对float、decimal类型字段有效 */
   precision?: number;
-  /**字段小数位位数，对 `float`、`decimal` 等类型字段有效 */
+  /**字段小数位位数，对float、decimal类型字段有效 */
   scale?: number;
-  /**字段是否可以为空，默认为 false */
-  nullable?: boolean;
-  /**string|number|float|字段默认值 */
-  default?: string;
-  /**字段加密存储方式。许可值 `AES(MySQL Only)`, `PASSWORD` */
-  crypt?: "PASSWORD" | "AES";
-  /** Relation: domain=> ddic.domain */
-  domain?: ddic_domain;
+  /**字段的可选项，对enum类型字段有效 */
+  options?: any[];
+  /**字段校验规则 */
+  validations?: any[];
 }
 
 /**
@@ -149,7 +141,7 @@ export interface ddic_form {
 /**
  * Model=> ddic.model.column.type (::Model Column Type)
  *
- * Table=> ddic_model_column_type (模型字段类型)
+ * Table=> ddic_model_column_type (模型数据类型)
  */
 export interface ddic_model_column_type {
   /**标识 */
@@ -172,38 +164,36 @@ export interface ddic_model_column {
   id?: number;
   /**字段所属的模型 */
   model_id: number;
-  /**数据库表的字段名 */
+  /**数据库表的字段名name */
   name: string;
-  /**数据元素ID */
+  /**字段显示名称label，用于在管理表单，开发平台等成场景下呈现 */
+  label: string;
+  /**字段是否为索引index，默认为 false */
+  index?: boolean;
+  /**字段是否为唯一索引unique，默认为 false , 如为 true 无需同时将 `index` 设置为 true */
+  unique?: boolean;
+  /**数据元素ID，element_id */
   element_id?: number;
-  /**字段显示名称，用于在管理表单，开发平台等成场景下呈现 */
-  label?: string;
-  /**字段类型定义 */
+  /**数据类型定义type */
   type?: string;
-  /**字段长度，对 `string` 等类型字段有效 */
+  /**字段长度length，对 `string` 等类型字段有效 */
   length?: number;
-  /**字段位数(含小数位)，对 `float`、`decimal` 等类型字段有效 */
+  /**字段位数(含小数位)precision，对 `float`、`decimal` 等类型字段有效 */
   precision?: number;
-  /**字段小数位位数，对 `float`、`decimal` 等类型字段有效 */
+  /**字段小数位位数scale，对 `float`、`decimal` 等类型字段有效 */
   scale?: number;
-  /**是否空值，默认为 false */
+  /**是否允许空值nullable，默认为 false */
   nullable?: boolean;
-  /**string|number|float|字段默认值 */
-  default?: string;
   /**字段加密存储方式。许可值 `AES(MySQL Only)`, `PASSWORD` */
   crypt?: "PASSWORD" | "AES";
-  /**字段是否为索引，默认为 false */
-  index?: boolean;
-  /**字段是否为唯一索引，默认为 false , 如为 true 无需同时将 `index` 设置为 true */
-  unique?: boolean;
-  /**字段是否为主键，每张表至多一个主键字段。默认为 false */
-  primary?: boolean;
-  /**注释 */
+  /**string|number|float|字段默认值default */
+  default?: string;
+  /**注释，comment */
   comment?: string;
-  /** Relation: model=> ddic.model */
-  model?: ddic_model;
   /** Relation: element=> ddic.element */
   element?: ddic_element;
+  /** Relation: model=> ddic.model */
+  model?: ddic_model;
 }
 
 /**
@@ -214,20 +204,20 @@ export interface ddic_model_column {
 export interface ddic_model_relation {
   /**表名 */
   id?: number;
-  /**所属模型 */
-  model_id: number;
   /**定义关系名称 */
   name: string;
+  /**关系描述 */
+  label: string;
   /**与当前数据模型的关系类型. `hasOne` 一对一, `hasMany` 一对多。 */
   type: "hasOne" | "hasMany";
+  /**关联的模型 */
+  model: string;
   /**外键 */
   foreign: string;
-  /**主键 */
+  /**关联模型主键 */
   key: string;
   /**关联条件 */
   query?: string;
-  /** Relation: model=> ddic.model */
-  model?: string;
 }
 
 /**
@@ -239,18 +229,16 @@ export interface ddic_model {
   /**表名 */
   id?: number;
   /**undefined */
-  namespace?: string;
-  /**undefined */
   name: string;
   /**模型定义注释 */
-  model_comment?: string;
+  comment?: string;
   /**undefined */
-  table_name: string;
+  table_name?: string;
   /**对应数据表中字段注释 */
   table_comment?: string;
   /**软删除，不直接删除 */
   soft_deletes?: boolean;
-  /**增加创建，更新时间戳 */
+  /**增加创建，更新时间戳timestamps */
   timestamps?: boolean;
   /**关联关系 */
   relations?: ddic_model_relation[];
@@ -382,12 +370,12 @@ export interface ddic_table {
   comment: string;
   /**介绍 */
   description: string;
+  /** Relation: form=> ddic.form */
+  form?: ddic_form;
   /** Relation: fields=> ddic.table.field */
   fields?: ddic_table_field[];
   /** Relation: model=> ddic.model */
   model?: ddic_model;
-  /** Relation: form=> ddic.form */
-  form?: ddic_form;
 }
 
 /**
