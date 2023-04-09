@@ -36,7 +36,7 @@ export function CreateFromFile() {
   // 创建菜单
   Studio("model.menu.Create", modelDsls);
 
-  Studio("model.ts.CreatTypes", modelDsls);
+  Studio("model.ts.CreatTSTypes", modelDsls);
 }
 
 export function CreateMenuFromFile() {

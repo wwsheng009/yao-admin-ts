@@ -15,10 +15,9 @@ interface OnChangeEvent {
  * @returns 新值与界面配置
  */
 export function onChange(query: OnChangeEvent): {
-  data?: MapAny;
   setting?: XgenForm.Setting;
 } {
-  const { key, value, params, isOnload } = query;
+  const { key, value } = query;
 
   let setting: XgenForm.Setting = Process(
     "yao.form.Setting",
@@ -26,20 +25,37 @@ export function onChange(query: OnChangeEvent): {
   ); // 根据新数值生成配置信息;
 
   if (key === "type") {
-    if (value === "enum") {
-      setting.form.sections = filterColumns(
-        ["描述", "数据类型", "可选项", "备注"],
-        setting.form.sections
-      );
-    } else if (value === "string") {
-      setting.form.sections = filterColumns(
-        ["描述", "数据类型", "备注", "校验规则"],
-        setting.form.sections
-      );
-    } else if (value === "test") {
-      setting.form.sections = filterColumns(["可选项"], setting.form.sections);
+    let columnsToFilter = ["长度", "校验规则"];
+    switch (value) {
+      case "ID":
+      case "boolean":
+        columnsToFilter = ["备注"];
+        break;
+      case "enum":
+        columnsToFilter = ["可选项", "备注"];
+        break;
+      case "float":
+      case "double":
+      case "decimal":
+        columnsToFilter = ["位数(含小数位)", "小数位位数", "校验规则"];
+        break;
+      case "integer":
+      case "bigInteger":
+        columnsToFilter = ["位数(含小数位)", "校验规则"];
+        break;
+      case "date":
+      case "datetime":
+        columnsToFilter = ["校验规则"];
+        break;
     }
+    columnsToFilter = columnsToFilter.concat(["描述", "数据类型", "备注"]);
+
+    setting.form.sections = filterColumns(
+      columnsToFilter,
+      setting.form.sections
+    );
   }
+
   return { setting };
 }
 
