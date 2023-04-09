@@ -1,9 +1,14 @@
+#!/bin/bash
 
 pnpm run yao:build-fix
 
-target=/data/projects/yao/demos-v1.0/yao-admin
-target=/tmp/yao-admin
+source .env
 
+target=/data/projects/yao/demos-v1.0/yao-admin
+
+target="${YAO_APP_ROOT}"
+
+echo "目标目录：${target}"
 
 rm -rf ${target}/studio/*
 cp -rf dist_esm/app/studio/* ${target}/studio/
