@@ -10,7 +10,10 @@ import { Process, Studio } from "yao-node-client";
  */
 export function select(relation_name: string, releation: YaoModel.Relation) {
   //首先从关联关系的模型中找到模型
-  let model: YaoModel.ModelDSL = Studio("model.cmd.Get", releation.model);
+  let model: YaoModel.ModelDSL = Studio(
+    "model.model.GetModel",
+    releation.model
+  );
   if (!model) {
     model = Process("schemas.default.TableGet", relation_name);
   }
@@ -72,9 +75,8 @@ export function CreateScripts(
   name: string,
   relation: YaoModel.Relation
 ) {
-  const field_name = relation_name + ".js";
-  // const fs = new FS("script");
-  const formDsl = `export function GetSelect() {
+  const field_name = relation_name + "_query.js";
+  const script = `export function GetSelect() {
     let query = new Query();
     let res = query.Get({
       select: ["id as value", "${name} as label"],
@@ -83,23 +85,5 @@ export function CreateScripts(
     return res;
   }
   `;
-  // const dir = relation.model + "/" + field_name;
-  //console.log(formDsl);
-
-  Studio(
-    "model.file.MoveAndWrite",
-    `scripts`,
-    `${relation.model}/${field_name}`,
-    formDsl
-  );
-  // fs.WriteFile("/" + dir, formDsl);
+  Studio("model.file.WriteScript", `${relation.model}/${field_name}`, script);
 }
-
-// export function GetSelect() {
-//   let query = new Query();
-//   let res = query.Get({
-//     select: ["id as value", "${name} as label"],
-//     from: "${relation_name}",
-//   });
-//   return res;
-// }

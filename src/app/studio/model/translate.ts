@@ -64,7 +64,8 @@ export function BatchTranslate(keywords: string) {
   return keywords;
 }
 /**
- * Model dsl全部翻译翻译
+ * Model dsl全部翻译
+ * yao studio run model.translate.BatchModel
  * @param {*} keywords
  * @returns
  */
@@ -79,10 +80,17 @@ export function BatchModel(keywords: YaoModel.ModelDSL[]): YaoModel.ModelDSL[] {
       col.label = Studio("model.translate.translate", col.label); //col.label.replace(/_id$/i, "");
       // col.name = col.name.replace(/_id$/i, "");
     });
-
-    model.comment = Studio("model.translate.translate", model.name);
-    model.table.comment = model.table.name;
-    model.table.name = Studio("model.translate.translate", model.table.name);
+    if (!model.comment) {
+      model.comment = Studio("model.translate.translate", model.name);
+    }
+    if (model.table) {
+      if (!model.table.comment) {
+        model.table.comment = Studio(
+          "model.translate.translate",
+          model.table.name
+        );
+      }
+    }
   });
   return models;
 
@@ -103,4 +111,23 @@ export function BatchModel(keywords: YaoModel.ModelDSL[]): YaoModel.ModelDSL[] {
     }
   }
   return keywords;
+}
+
+/**yao studio run model.translate.GetIcon user
+ * 获取菜单图标
+ * @param {*} name
+ */
+export function GetIcon(name: string) {
+  let useTranslate = Process("utils.env.Get", "USE_TRANSLATE");
+  if (useTranslate !== "TRUE") {
+    return "icon-box";
+  }
+
+  let url = "https://brain.yaoapps.com/api/icon/search?name=" + name;
+  let response = Process("xiang.network.Get", url, {}, {});
+  if (response.status == 200) {
+    return response.data.data;
+  }
+
+  return "icon-box";
 }

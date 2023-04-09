@@ -4,15 +4,18 @@
 // dotenv.config();
 
 // create dsls from data model dsl files
-import { CreateMenuFromFile, CreateFromFile } from "@/app/studio/model/cmd";
+import { CreateFromFile, CreateFromDB } from "@/app/studio/model/cmd";
 
-// CreateFromFile();
+// CreateFromDB();
+CreateFromFile();
 // CreateMenuFromFile();
 
 import { LoadModelFromFile } from "@/app/studio/ddic/loader";
 
 import { GenerateModelFile } from "@/app/studio/ddic/generator";
 
+import { CreateMenuFromModels } from "@/app/studio/model/model";
+// CreateMenuFromModels();
 // GenerateModelFile(14);
 
 // load model data to database
@@ -28,4 +31,4 @@ import { GenerateModelFile } from "@/app/studio/ddic/generator";
 
 import { onChange } from "@/app/scripts/ddic/xgen/element";
 
-onChange({ key: "type", value: "string" });
+// onChange({ key: "type", value: "string" });

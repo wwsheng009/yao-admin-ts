@@ -123,15 +123,12 @@ export function Cast(
 
   const bind = name;
   if (column.type == "json") {
-    component = Studio("model.column.file.IsFormFile", column, null, modelDsl);
-    if (!component) {
-      component = {
-        bind: bind,
-        edit: {
-          type: "TextArea",
-        },
-      };
-    }
+    component = {
+      bind: bind,
+      edit: {
+        type: "TextArea",
+      },
+    };
   } else if (column.type == "enum") {
     component = {
       bind: bind,
@@ -184,6 +181,13 @@ export function Cast(
   if (["TextArea"].includes(types[column.type]) || column.type === "json") {
     width = 24;
   }
+  component = Studio(
+    "model.column.file.IsFormFile",
+    column,
+    component,
+    modelDsl
+  );
+
   component = Studio("model.relation.EditSelect", column, modelDsl, component);
 
   // component = Studio(

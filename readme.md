@@ -33,15 +33,32 @@ pnpm run debug
 命令
 
 ```sh
+git clone https://github.com/wwsheng009/yao-admin my-admin --depth 1
+
+# 配置数据库连接
+yao start
+
+# 创建所有的ddic数据表
+yao migrate
+
+```
+
+```sh
+
+# 先从数据库中创建模型
+yao studio run model.cmd.CreateModelsFromDB
+
+# 进行模型调整
 
 # 根据模型生成界面定义
-yao studio run model.cmd.CreateFromFile
-#加载模型数据
+yao studio run model.model.CreateFromFile
+
+
+# 加载模型数据
 yao studio run ddic.loader.LoadModelFromFile
 
-
-
-yao studio run model.cmd.CreateList ddic.model.relation
+# 创建关联关系的list定义
+yao studio run model.model.CreateList ddic.model.relation
 
 yao start
 ```

@@ -1,10 +1,13 @@
-import { FS, Process, Studio } from "yao-node-client";
+import { Studio } from "yao-node-client";
 import { YaoFlow, YaoMenu, YaoModel } from "yao-app-ts-types";
 
+/**
+ * yao studio run model.dsl.menu.Create
+ * @param modelDsls model dsl list
+ */
 export function Create(modelDsls: YaoModel.ModelDSL[]) {
   let insert = [] as YaoMenu.MenuItems;
-  // let child = [];
-  // const total = modelDsls.length;
+
   insert.push({
     blocks: 0,
     icon: "icon-activity",
@@ -17,42 +20,47 @@ export function Create(modelDsls: YaoModel.ModelDSL[]) {
 
   const english = /^[A-Za-z0-9\._-]*$/;
 
-  let insert2 = [] as YaoMenu.MenuItems;
+  let menuModels = [] as YaoMenu.MenuItems;
 
   for (let i = 0; i < modelDsls.length; i++) {
     if (modelDsls[i].xgen?.menu?.no_display) {
       continue;
     }
-    let tableName = modelDsls[i].table.name;
-    if (!english.test(tableName)) {
-      tableName = modelDsls[i].table.comment;
-    }
+    let modName = modelDsls[i].name;
+    // let tableName = modelDsls[i].table.comment;
+    // if (!english.test(tableName) && modelDsls[i].table?.name) {
+    //   tableName = modelDsls[i].table.name;
+    // }
     // const trans = Studio("model.translate.translate", tableName);
-    const dotName = Studio("model.file.DotName", tableName);
-    const icon = GetIcon(tableName);
+    const path = Studio("model.file.DotName", modelDsls[i].table.name);
+    const icon = Studio("model.translate.GetIcon", modelDsls[i].table.name);
+
+    const menuName = modelDsls[i].comment
+      ? modelDsls[i].comment
+      : modelDsls[i].table?.comment
+      ? modelDsls[i].table?.comment
+      : modName
+      ? modName
+      : path;
 
     let item: YaoMenu.MenuItem = {
-      name: modelDsls[i].table.comment,
-      path: dotName, //"/x/Table/" + dotName, //转换后的
+      name: menuName,
+      path: path, //"/x/Table/" + dotName, //转换后的
       icon: icon,
       rank: i + 1,
       status: "enabled",
       visible_menu: 0,
-      extra: tableName, //需要用来处理chart.json数据
+      extra: modelDsls[i].table.name, //需要用来处理chart.json数据
       blocks: 0,
       id: (i + 1) * 10,
       children: [],
     };
-    insert2.push(item);
+    menuModels.push(item);
   }
   // 创建看板
-  Studio("model.dashboard.Create", insert2);
-
-  insert2 = MakeTree(insert2);
-  insert.push(...insert2);
-  // Studio("model.move.Mkdir", "flows");
-  Studio("model.move.Mkdir", "flows/app");
-  const fs = new FS("dsl");
+  Studio("model.dashboard.Create", menuModels);
+  menuModels = MakeTree(menuModels);
+  insert.push(...menuModels);
 
   const dsl: YaoFlow.Flow = {
     name: "APP Menu",
@@ -76,10 +84,7 @@ export function Create(modelDsls: YaoModel.ModelDSL[]) {
       ],
     },
   };
-
-  const json = JSON.stringify(dsl);
-  // console.log(`create menu:/flows/app/menu.flow.json`);
-  fs.WriteFile("/flows/app/menu.flow.json", json);
+  Studio("model.file.MoveAndWrite", "/flows/app", "menu.flow.json", dsl);
 }
 
 /**
@@ -103,6 +108,9 @@ export function MakeTree(menuItems: YaoMenu.MenuItem[]) {
       let node = map[key];
 
       if (!node) {
+        //中间跳级了。
+        //a.b 上一级
+        //a.b.c.d 下一级
         node = { name: "", path: key, children: [] };
         map[key] = node;
         parent.children.push(node);
@@ -136,7 +144,65 @@ function compress(
   items: YaoMenu.MenuItem[],
   level: number
 ): YaoMenu.MenuItem[] {
-  const newarray: YaoMenu.MenuItem[] = [];
+  let newarray: YaoMenu.MenuItem[] = [];
+
+  for (const item of items) {
+    if (level === 1) {
+      item.children = compress(item.children, level + 1);
+      if (item.children && item.children.length > 0) {
+        let first = item.children.find(
+          (item) => !item.path.endsWith("_folder")
+        );
+        if (!first) {
+          first = item.children[0];
+        }
+        const { name, path, icon, rank, status, visible_menu, id } = first;
+
+        item.name = name;
+        item.path = path;
+        item.icon = icon;
+        item.rank = rank;
+        item.status = status;
+        item.visible_menu = visible_menu;
+        item.id = id + 1;
+
+        if (item.path.endsWith("_folder")) {
+          item.path = item.path.slice(0, 0 - "_folder".length);
+        }
+      }
+
+      newarray.push(item);
+      continue;
+    } else {
+      if (item.name === "") {
+        newarray = newarray.concat(compress(item.children, level + 1));
+      } else {
+        const { name, path, icon, rank, status, visible_menu, id } = item;
+
+        if (item.children) {
+          const children = compress(item.children, level + 1);
+          if (children.length === 1) {
+            newarray = newarray.concat(children);
+            continue;
+          } else if (children.length > 1 && level > 1) {
+            item.children = children;
+            item.path += "_folder";
+            item.children.unshift({
+              name,
+              path,
+              icon,
+              rank: rank + 1,
+              status,
+              visible_menu,
+              id: id + 1,
+            });
+          }
+        }
+        newarray.push(item);
+      }
+    }
+  }
+  return newarray;
 
   for (const item of items) {
     if (item.name === "") {
@@ -167,39 +233,22 @@ function compress(
       if (level > 1) {
         item.path += "_folder";
       }
-      item.children.unshift({
-        name,
-        path,
-        icon,
-        rank: rank + 1,
-        status,
-        visible_menu,
-        id: id + 1,
-      });
-      newarray.push(item);
+      if (name !== "") {
+        item.children.unshift({
+          name,
+          path,
+          icon,
+          rank: rank + 1,
+          status,
+          visible_menu,
+          id: id + 1,
+        });
+        newarray.push(item);
+      }
     } else {
       newarray.push(item);
     }
   }
 
   return newarray;
-}
-
-/**yao studio run model.menu.icon user
- * 获取菜单图标
- * @param {*} name
- */
-export function GetIcon(name: string) {
-  let useTranslate = Process("utils.env.Get", "USE_TRANSLATE");
-  if (useTranslate !== "TRUE") {
-    return "icon-box";
-  }
-
-  let url = "https://brain.yaoapps.com/api/icon/search?name=" + name;
-  let response = Process("xiang.network.Get", url, {}, {});
-  if (response.status == 200) {
-    return response.data.data;
-  }
-
-  return "icon-box";
 }

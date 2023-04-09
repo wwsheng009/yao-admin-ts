@@ -1,6 +1,7 @@
 import { MapAny, YaoForm, YaoModel } from "yao-app-ts-types";
 import { Studio } from "yao-node-client";
 import { FieldColumn } from "../types";
+import { json } from "stream/consumers";
 
 const parents = ["parent", "parent_id", "pid"];
 const children = ["children", "children_id", "child", "child_id"];
@@ -33,18 +34,18 @@ export function child(
 
 /**
  * 分析子集
- * @param {*} model_name
+ * @param {*} modelName
  * @param {*} columns
  * @param {*} table_struct
  * @returns
  */
 
 export function parent(
-  model_name: string,
+  modelName: string,
   columns: YaoModel.ModelColumn[],
   table_struct: YaoModel.ModelDSL
 ) {
-  const dotName = Studio("model.file.DotName", model_name);
+  const dotName = Studio("model.file.DotName", modelName);
   const parentColumn = columns.find(
     (column) => column.type === "integer" && parents.includes(column.name)
   );
@@ -291,30 +292,35 @@ export function GetWiths(modelDsl: YaoModel.ModelDSL) {
  * 把hasMany变成表单中的Table
  */
 export function Table(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
-  const relation = modelDsl.relations;
-  for (const rel in relation) {
+  const relations = modelDsl.relations;
+  for (const rel in relations) {
     // console.log(`translate.translate:${i}`);
-
-    const translate = Studio("model.translate.translate", rel);
-    if (relation[rel].type == "hasMany") {
-      formDsl.fields.form["表格" + translate] = {
-        bind: "id",
-        edit: {
-          type: "Table",
-          props: {
-            model: relation[rel]["model"],
-            query: {
-              [`where.${relation[rel].key}.eq`]: "{{id}}",
-            },
+    if (relations[rel].type != "hasMany") {
+      continue;
+    }
+    let label = relations[rel].label;
+    if (!label) {
+      label = "列表" + Studio("model.translate.translate", rel);
+    }
+    if (!label) {
+      label = rel;
+    }
+    formDsl.fields.form[label] = {
+      bind: "id",
+      edit: {
+        type: "Table",
+        props: {
+          model: relations[rel].model,
+          query: {
+            [`where.${relations[rel].key}.eq`]: "{{id}}",
           },
         },
-      };
-      formDsl.layout.form.sections.push({
-        // title: "表格" + translate + "信息",
-        // desc: "表格" + translate + "信息",
-        columns: [{ name: "表格" + translate, width: 24 }],
-      });
-    }
+      },
+    };
+    formDsl = Studio("model.column.form.AddTabColumn", formDsl, {
+      name: label,
+      width: 24,
+    });
   }
   return formDsl;
 }
@@ -337,7 +343,7 @@ export function List(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
 
   let RelList: RelationShip[] = [];
 
-  let tabs: YaoForm.SectionDSL[] = [];
+  // let tabs: YaoForm.SectionDSL[] = [];
   for (const rel in relations) {
     // console.log(`translate.translate:${i}`);
     if (relations[rel].type != "hasMany") {
@@ -367,22 +373,11 @@ export function List(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
         },
       },
     };
-    // tabs.push({
-    //   // Tab一定要有标题，要不然不会显示
-    //   title: label,
-    //   // desc: "表格" + translate + "信息",
-    //   columns: [{ name: label, width: 24 }],
-    // });
     formDsl = Studio("model.column.form.AddTabColumn", formDsl, {
       name: label,
       width: 24,
     });
   }
-  // formDsl.layout.form.sections.push({
-  //   // title: "关联表",
-  //   // desc: "表格信息",
-  //   columns: [{ name: "列表", tabs, width: 24 }],
-  // });
 
   const tabName = modelDsl.table.name;
   let funtionName = Studio("model.file.SlashName", tabName);
@@ -566,25 +561,21 @@ function CreateListFile(rel: RelationShip) {
   const modelName = rel.model;
   const excludeField = rel.key;
 
-  let modelDsl: YaoModel.ModelDSL = Studio("model.cmd.Get", modelName);
+  let modelDsl: YaoModel.ModelDSL = Studio("model.model.GetModel", modelName);
   if (!modelDsl) {
     console.log(`Model ${modelName} not exist`);
     return;
   }
-
   //在列表显示中不需要显示外键
   modelDsl.columns = modelDsl.columns.filter(
     (col) => col.name !== excludeField
   );
 
   let listDsl = Studio("model.column.list.toList", modelDsl); //这里有studio js读取操作
-  // let listJson = JSON.stringify(listDsl);
 
-  // let fs = new FS("dsl");
   let tableName = Studio("model.file.SlashName", modelDsl.table.name);
 
   let listFileName = tableName + ".list.json";
 
   Studio("model.file.MoveAndWrite", "lists", listFileName, listDsl);
-  // fs.WriteFile("/lists/" + listFileName, listJson);
 }

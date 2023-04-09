@@ -24,6 +24,10 @@ export function onChange(query: OnChangeEvent): {
     "ddic.model.element"
   ); // 根据新数值生成配置信息;
 
+  if (!setting.form?.sections) {
+    console.log("error! no sections found for ddic.model.element!");
+    return {};
+  }
   if (key === "type") {
     let columnsToFilter = ["长度", "校验规则"];
     switch (value) {

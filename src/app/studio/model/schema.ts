@@ -3,8 +3,10 @@ import { Exception, log, Process, Studio } from "yao-node-client";
 
 let AllTables: string[] = [];
 
-/**yao studio run model.schema.GetTable role
- * 获取单个表字段
+/**
+ * 获取数据库中单个表字段
+ *
+ * yao studio run model.schema.GetTable tablename
  * @param {*} name
  * @returns
  */
@@ -12,7 +14,9 @@ export function GetTable(name: string): YaoModel.ModelDSL {
   return Process("schemas.default.TableGet", name);
 }
 /**
- * 获取所有表格名称
+ * yao studio run model.schema.GetTableName
+ *
+ * 获取数据库中所有表格名称
  */
 export function GetTableName(): string[] {
   if (AllTables.length) {
@@ -24,7 +28,8 @@ export function GetTableName(): string[] {
 }
 
 /**
- * 分析关联关系处理器
+ * 分析数据库表之间的关联关系
+ *
  * yao studio run model.schema.Relation
  */
 export function Relation(): YaoModel.ModelDSL[] {
@@ -33,15 +38,20 @@ export function Relation(): YaoModel.ModelDSL[] {
 
   const guards = ["xiang_menu", "xiang_user", "xiang_workflow", "pet"];
   const prefixList = TablePrefix(tableNameList);
-  if (tableNameList.length > 80) {
-    log.Error("Data tables cannot exceed 80!");
-    throw new Exception("Data tables cannot exceed 80!", 500);
+  if (tableNameList.length > 180) {
+    log.Error("Data tables cannot exceed 180!");
+    throw new Exception("Data tables cannot exceed 180!", 500);
   }
   let tableList: YaoModel.ModelDSL[] = [];
 
   for (const tableName of tableNameList) {
     // const tableName = tableNameList[i];
     if (guards.includes(tableName)) {
+      console.log(`忽略系统表：${tableName}`);
+      continue;
+    }
+    if (tableName.startsWith("ddic")) {
+      console.log(`忽略系统表：${tableName}`);
       continue;
     }
     const table = GetTable(tableName);
@@ -86,7 +96,7 @@ export function Relation(): YaoModel.ModelDSL[] {
     };
     table.relations = {};
     let parent: YaoModel.ModelDSL = Studio(
-      "relation.parent",
+      "model.relation.parent",
       tableName,
       table.columns,
       table

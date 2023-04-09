@@ -130,7 +130,7 @@ export function UpdateRelationFromDsl(
  * yao studio run ddic.loader.LoadModelFromFile
  */
 export function LoadModelFromFile() {
-  const files: string[] = Studio("model.cmd.GetModelFnameList");
+  const files: string[] = Studio("model.model.GetModelFnameList");
   const fs = new FS("dsl");
   const modelDsl = files.map((file) => {
     return JSON.parse(fs.ReadFile("models/" + file));

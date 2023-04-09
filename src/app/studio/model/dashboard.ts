@@ -1,18 +1,15 @@
 import { YaoChart, YaoComponent, YaoMenu } from "yao-app-ts-types";
-import { FS, Query, Studio } from "yao-node-client";
+import { Query, Studio } from "yao-node-client";
 
 /**
  * 根据菜单创建图表
+ *
+ * yao studio model.dashboard.Create
  * @param menu_arr 菜单列表
  * @param type 类型，1是二级菜单，2是一级菜单
  */
-export function Create(menu_arr: YaoMenu.MenuItem[], type: number) {
-  // const fs = new FS("dsl");
-
-  // Studio("model.move.Move", "charts", "dashboard.chart.json");
+export function Create(menu_arr: YaoMenu.MenuItem[]) {
   let dsl = ChartDsl(menu_arr);
-  //console.log(`create dashboard:/charts/dashboard.chart.json"`);
-  // fs.WriteFile("/charts/" + "dashboard.chart.json", JSON.stringify(dsl));
 
   Studio("model.file.MoveAndWrite", "charts", "dashboard.chart.json", dsl);
 }
