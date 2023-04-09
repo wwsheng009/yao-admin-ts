@@ -1,5 +1,5 @@
 import {
-  ddic_element,
+  ddic_model_element,
   ddic_model,
   ddic_model_column,
   ddic_model_relation,
@@ -77,7 +77,7 @@ export function UpdateColumnFromDsl(
 ): ddic_model_column {
   let col = modelCol as ddic_model_column;
   if (modelCol.option || modelCol.validations) {
-    let element: ddic_element = {
+    let element: ddic_model_element = {
       name: model.name + "_" + modelCol.name,
     };
     element.type = modelCol.type;
@@ -92,8 +92,8 @@ export function UpdateColumnFromDsl(
     element.validations = modelCol.validations;
 
     //查找是否存在相同的对象
-    const { data }: { data: ddic_element } = Process(
-      "models.ddic.element.Paginate",
+    const { data }: { data: ddic_model_element } = Process(
+      "models.ddic.model.element.Paginate",
       {
         wheres: [{ column: "name", value: element.name }],
         with: {},
@@ -103,11 +103,11 @@ export function UpdateColumnFromDsl(
     );
     let id = data?.id;
 
-    let data1: ddic_element = {
+    let data1: ddic_model_element = {
       id,
       ...element,
     };
-    id = Process("models.ddic.element.Save", data1);
+    id = Process("models.ddic.model.element.Save", data1);
     col.element_id = id;
   }
   return col;

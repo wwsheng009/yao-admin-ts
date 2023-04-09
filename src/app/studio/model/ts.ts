@@ -13,9 +13,9 @@ export function CreateModelTypes(type: string = "ddic") {
     .map((file) => {
       return JSON.parse(fs.ReadFile("models/" + file));
     });
-  CreatTypes(modelDsl);
+  CreatTSTypes(modelDsl);
 }
-export function CreatTypes(models: YaoModel.ModelDSL[]) {
+export function CreatTSTypes(models: YaoModel.ModelDSL[]) {
   const typeMapping = getTSTypeMapping();
 
   const codes = models.map((model) => {
@@ -129,5 +129,6 @@ function getTSTypeMapping() {
     boolean: "boolean",
     enum: "Select",
     json: "any[]",
+    JSON: "string", //使用大写的JSON区分小写的json
   };
 }

@@ -6,7 +6,7 @@
 // create dsls from data model dsl files
 import { CreateMenuFromFile, CreateFromFile } from "@/app/studio/model/cmd";
 
-CreateFromFile();
+// CreateFromFile();
 // CreateMenuFromFile();
 
 import { LoadModelFromFile } from "@/app/studio/ddic/loader";
@@ -25,3 +25,7 @@ import { GenerateModelFile } from "@/app/studio/ddic/generator";
 
 // import { CreateList } from "@/app/studio/model/cmd";
 // CreateList("ddic.model.relation");
+
+import { onChange } from "@/app/scripts/ddic/xgen/element";
+
+onChange({ key: "type", value: "string" });

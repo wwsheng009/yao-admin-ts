@@ -22,33 +22,6 @@ export interface ddic_domain {
 }
 
 /**
- * Model=> ddic.element (::Data Element)
- *
- * Table=> ddic_element (数据元素)
- */
-export interface ddic_element {
-  [key: string]: any;
-  /**标识 */
-  id?: number;
-  /**undefined */
-  name: string;
-  /**数据类型定义 */
-  type?: string;
-  /**字段长度，对文本类型字段有效 */
-  length?: number;
-  /**位数(含小数位)，对float、decimal类型字段有效 */
-  precision?: number;
-  /**字段小数位位数，对float、decimal类型字段有效 */
-  scale?: number;
-  /**字段的可选项，对enum类型字段有效 */
-  options?: any[];
-  /**字段校验规则 */
-  validations?: any[];
-  /**数据元素注释 */
-  comment?: string;
-}
-
-/**
  * Model=> ddic.form.action (::Form Action)
  *
  * Table=> ddic_form_action (表单动作)
@@ -137,12 +110,12 @@ export interface ddic_form {
   bind_option: any[];
   /**表注释 */
   comment: string;
+  /** Relation: fields=> ddic.form.field */
+  fields?: ddic_form_field[];
   /** Relation: model=> ddic.model */
   model?: ddic_model;
   /** Relation: table=> ddic.table */
   table?: ddic_table;
-  /** Relation: fields=> ddic.form.field */
-  fields?: ddic_form_field[];
 }
 
 /**
@@ -158,6 +131,8 @@ export interface ddic_model_column_type {
   type: string;
   /**undefined */
   name: string;
+  /**undefined */
+  status?: "enabled" | "disabled";
   /**注释 */
   comment?: string;
 }
@@ -201,8 +176,35 @@ export interface ddic_model_column {
   comment?: string;
   /** Relation: model=> ddic.model */
   model?: ddic_model;
-  /** Relation: element=> ddic.element */
-  element?: ddic_element;
+  /** Relation: element=> ddic.model.element */
+  element?: ddic_model_element;
+}
+
+/**
+ * Model=> ddic.model.element (::Data Model Element)
+ *
+ * Table=> ddic_model_element (数据元素)
+ */
+export interface ddic_model_element {
+  [key: string]: any;
+  /**标识 */
+  id?: number;
+  /**undefined */
+  name: string;
+  /**数据类型定义 */
+  type?: string;
+  /**字段长度，对文本类型字段有效 */
+  length?: number;
+  /**位数(含小数位)，对float、decimal类型字段有效 */
+  precision?: number;
+  /**字段小数位位数，对float、decimal类型字段有效 */
+  scale?: number;
+  /**字段的可选项，对enum类型字段有效 */
+  options?: any[];
+  /**字段校验规则 */
+  validations?: any[];
+  /**数据元素注释 */
+  comment?: string;
 }
 
 /**
@@ -420,17 +422,4 @@ export interface demo_pet {
   cost: number;
   /**undefined */
   images?: any[];
-}
-
-/**
- * Model=> demo.supplier (demo.supplier)
- *
- * Table=> demo_supplier (供应商表)
- */
-export interface demo_supplier {
-  [key: string]: any;
-  /**主键 */
-  id?: number;
-  /**undefined */
-  name: string;
 }

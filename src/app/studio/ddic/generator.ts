@@ -68,7 +68,11 @@ export function DBModelToYaoModel(model_ddic: ddic_model): YaoModel.ModelDSL {
     let col1 = col as YaoModel.ModelColumn;
 
     if (col.element_id) {
-      col.element = Process("models.ddic.element.Find", col.element_id, {});
+      col.element = Process(
+        "models.ddic.model.element.Find",
+        col.element_id,
+        {}
+      );
 
       ["type", "length", "scale", "precision", "comment"].forEach((field) => {
         if (!col[field] && col.element[field]) {
