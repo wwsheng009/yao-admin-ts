@@ -96,6 +96,7 @@ export function MakeTree(menuItems: YaoMenu.MenuItem[]) {
   //a.b
   //a.b.c
   //a.b.c.d
+
   const root: YaoMenu.MenuItem = { name: "", path: "", children: [] };
   const map: { [key: string]: YaoMenu.MenuItem } = { "": root };
 
@@ -182,6 +183,9 @@ function compress(
         if (item.children) {
           const children = compress(item.children, level + 1);
           if (children.length === 1) {
+            delete item.children;
+            newarray.push(item);
+
             newarray = newarray.concat(children);
             continue;
           } else if (children.length > 1 && level > 1) {

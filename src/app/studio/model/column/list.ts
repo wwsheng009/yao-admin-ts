@@ -86,6 +86,7 @@ export function Cast(
   modelDsl: YaoModel.ModelDSL
 ): false | FormDefinition {
   const types = Studio("model.column.component.GetDBTypeMap");
+  const ismysql: boolean = Studio("model.utils.IsMysql");
 
   const title = column.label || column.name;
   const name = column.name;
@@ -140,9 +141,12 @@ export function Cast(
         type: "Select",
       },
     };
-  } else if (column.type === "boolean") {
-    const ismysql: boolean = Studio("model.utils.IsMysql");
-
+  } else if (
+    column.type === "boolean" ||
+    (column.type === "tinyInteger" &&
+      ismysql &&
+      (column.default === 0 || column.default === 1))
+  ) {
     let checkedValue: boolean | number = true;
     let unCheckedValue: boolean | number = false;
 

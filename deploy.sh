@@ -15,4 +15,5 @@ cp -rf dist_esm/app/studio/* ${target}/studio/
 
 if [ -d "dist_esm/app/scripts/ddic" ]; then
  cp -rf dist_esm/app/scripts/ddic/* ${target}/scripts/ddic/
+ cp -rf dist_esm/app/scripts/file/* ${target}/scripts/file/
 fi

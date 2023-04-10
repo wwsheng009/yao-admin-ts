@@ -178,6 +178,7 @@ export function Cast(
   // const props = column.props || {};
   let title = column.label || column.name;
   const name = column.name;
+  const ismysql: boolean = Studio("model.utils.IsMysql");
 
   // 不展示隐藏列
   let hidden = Studio("model.column.component.HiddenFields", true);
@@ -264,10 +265,14 @@ export function Cast(
         type: "Tag",
       },
     };
-  } else if (column.type === "boolean") {
+  } else if (
+    column.type === "boolean" ||
+    (column.type === "tinyInteger" &&
+      ismysql &&
+      (column.default === 0 || column.default === 1))
+  ) {
     let checkedValue: boolean | number = true;
     let unCheckedValue: boolean | number = false;
-    const ismysql: boolean = Studio("model.utils.IsMysql");
 
     if (ismysql) {
       checkedValue = 1;

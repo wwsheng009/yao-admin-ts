@@ -2,6 +2,7 @@
 
 import { YaoModel } from "yao-app-ts-types";
 import { FieldColumn } from "../../types";
+import { Studio } from "yao-node-client";
 
 // 根据图片组件更新组件类型,只查看
 /**
@@ -15,6 +16,11 @@ export function IsFile(
   column: YaoModel.ModelColumn,
   component: FieldColumn
 ): FieldColumn {
+  if (
+    !["text", "json", "string", "logngtext", "mediumText"].includes(column.type)
+  ) {
+    return component;
+  }
   var guard = [
     "img",
     "image",
@@ -34,7 +40,7 @@ export function IsFile(
   ];
   const name = column.name;
   for (var i in guard) {
-    if (name.indexOf(guard[i]) != -1) {
+    if (name.includes(guard[i])) {
       var component: FieldColumn = {
         bind: name,
         view: {
@@ -48,7 +54,6 @@ export function IsFile(
           //compute: "scripts.file.image.ImagesEdit",
           props: {
             filetype: "image",
-            disabled: true,
             $api: {
               process: "fs.system.Upload",
             },
@@ -75,6 +80,12 @@ export function IsFormFile(
   component: FieldColumn,
   modelDsl: YaoModel.ModelDSL
 ): FieldColumn {
+  if (
+    !["text", "json", "string", "logngtext", "mediumText"].includes(column.type)
+  ) {
+    return component;
+  }
+
   var guard = [
     "img",
     "image",

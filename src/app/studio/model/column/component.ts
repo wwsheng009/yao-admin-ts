@@ -230,11 +230,11 @@ function GetRules(
   };
 
   const dbTypeToAntd: { [key: string]: any } = {
-    string: "string",
-    char: "string",
-    text: "string",
-    mediumText: "string",
-    longText: "string",
+    // string: "string",有可能是json
+    // char: "string",
+    // text: "string",
+    // mediumText: "string",
+    // longText: "string",
     date: "date",
     datetime: "date",
     datetimeTz: "date",
@@ -249,9 +249,9 @@ function GetRules(
     unsignedSmallInteger: "integer",
     integer: "integer",
     bigInteger: "integer",
-    decimal: "number",
-    unsignedDecimal: "number",
-    float: "number",
+    // decimal: "number", 过于严格
+    // unsignedDecimal: "number",
+    // float: "number",
     boolean: "boolean",
     enum: "enum",
     image: "array",
@@ -272,15 +272,14 @@ function GetRules(
     if (antdType === "enum") {
       rule.type = antdType;
       rule.enum = column.option;
-    } else if (antdType) {
+    } else if (antdType !== null && antdType !== undefined) {
       rule.type = antdType as any;
     }
-
-    if (["string", "number"].includes(antdType) && column.length) {
-      //MAX Length
-      rule.max = column.length;
-    }
   }
+  // if (column.length) {
+  //MAX Length
+  // rule.max = column.length;
+  // }
   if (
     !/^id$/i.test(dbColumnType) &&
     (index ||
