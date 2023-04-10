@@ -249,11 +249,12 @@ function GetRules(
     unsignedSmallInteger: "integer",
     integer: "integer",
     bigInteger: "integer",
-    decimal: "float",
-    unsignedDecimal: "float",
-    float: "float",
+    decimal: "number",
+    unsignedDecimal: "number",
+    float: "number",
     boolean: "boolean",
     enum: "enum",
+    image: "array",
   };
 
   const rules: RuleObject[] = [];
