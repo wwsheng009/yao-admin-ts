@@ -254,7 +254,7 @@ function updateReference(
         payload: {
           Form: {
             type: "view",
-            model: modelDsl.relations[rel].model,
+            model: modelDsl.relations[rel].model + "_view",
             id: `{{${modelDsl.relations[rel].foreign}}}`,
           },
         },
@@ -269,7 +269,7 @@ function updateReference(
       payload: {
         Form: {
           type: "view",
-          model: referenceContent[0].payload.Form.model,
+          model: referenceContent[0].payload.Form.model + "_view",
           id: `${referenceContent[0].payload.Form.id}`,
         },
       },

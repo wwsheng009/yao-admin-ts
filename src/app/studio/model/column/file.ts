@@ -107,7 +107,7 @@ export function IsFormFile(
           type: "Upload",
           compute: {
             process: "scripts.file.image.ImagesEdit",
-            args: ["$C(row)", "$C(type)", name, modelDsl.table.name],
+            args: ["$C(row)", name, modelDsl.table.name],
           },
           props: {
             filetype: "image",
