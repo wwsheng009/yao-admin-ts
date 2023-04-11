@@ -1,4 +1,4 @@
-import { MapAny, YaoForm, YaoModel } from "yao-app-ts-types";
+import { MapAny, YaoForm, YaoModel, YaoQueryParam } from "yao-app-ts-types";
 import { Studio } from "yao-node-client";
 import { FieldColumn } from "../types";
 import { json } from "stream/consumers";
@@ -378,7 +378,9 @@ export function List(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
       width: 24,
     });
   }
-
+  if (RelList.length === 0) {
+    return formDsl;
+  }
   const tabName = modelDsl.table.name;
   let funtionName = Studio("model.file.SlashName", tabName);
   let modelName = Studio("model.file.DotName", tabName);
@@ -387,6 +389,7 @@ export function List(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
   //function templates
   const saveDataFunList = RelList.map((rel) => CreateDataSaveCode(rel));
   const deleteDataFunList = RelList.map((rel) => CreateDataDeleteCode(rel));
+  const AfterFind = CreateAfterFind(relations);
 
   //called code list
   const saveDataCodes = RelList.map((rel) => `Save_${rel.name}(id,payload);`);
@@ -397,6 +400,7 @@ export function List(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
       process: `scripts.${modelName}.Save`,
     };
     formDsl.action["before:delete"] = `scripts.${modelName}.BeforeDelete`;
+    formDsl.action["after:find"] = `scripts.${modelName}.AfterFind`;
 
     WriteScript(
       funtionName,
@@ -404,10 +408,63 @@ export function List(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
       saveDataCodes,
       deleteDataCodes,
       saveDataFunList,
-      deleteDataFunList
+      deleteDataFunList,
+      AfterFind
     );
   }
   return formDsl;
+}
+function CreateAfterFind(relations: { [key: string]: YaoModel.Relation }) {
+  let templates: string[] = [];
+
+  const payload: { id: number } = {
+    id: 0,
+  };
+  for (const rel in relations) {
+    const element = relations[rel];
+    if (element.type !== "hasMany") {
+      continue;
+    }
+
+    const model: YaoModel.ModelDSL = Studio(
+      "model.model.GetModel",
+      element.model
+    );
+    if (!model) {
+      console.log(`模型${element.model}不存在！`);
+      continue;
+    }
+    let query: YaoQueryParam.QueryParam = {};
+    if (element.query) {
+      query = element.query;
+    } else {
+    }
+    if (!query.table) {
+      query.table = model.table.name;
+    }
+    // if (!query.limit) {
+    //   query.limit = 100;
+    // }
+    query.wheres = query.wheres || [];
+    query.wheres.push({
+      column: element.key,
+      op: "=",
+      value: payload.id,
+    });
+
+    templates.push(`payload[${rel}]= t.Get({
+      query: ${JSON.stringify(query)},
+  });`);
+  }
+
+  return `
+//多对一表数据查找
+function AfterFind(payload){
+  const t = new Query();
+ ${templates.join("\n")}
+ return payload;
+}
+  `;
 }
 function CreateDataDeleteCode(rel: RelationShip) {
   return `
@@ -471,7 +528,8 @@ function WriteScript(
   saveDataCodes: string[],
   deleteDataCodes: string[],
   saveDataFunctionList: string[],
-  deleteDataFuntionList: string[]
+  deleteDataFuntionList: string[],
+  AfterFind: string
 ) {
   // let sc = new FS("script");
   let scripts = `
@@ -514,6 +572,7 @@ ${saveDataFunctionList.join("\n")}
 
 ${deleteDataFuntionList.join("\n")}
 
+${AfterFind}
 `;
   // sc.WriteFile(`/${functionName}.js`, scripts);
   Studio("model.file.WriteScript", `/${functionName}.js`, scripts);
