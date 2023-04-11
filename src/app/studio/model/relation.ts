@@ -1,4 +1,4 @@
-import { MapAny, YaoForm, YaoModel, YaoQueryParam } from "yao-app-ts-types";
+import { MapAny, YaoForm, YaoModel, YaoQuery } from "yao-app-ts-types";
 import { Studio } from "yao-node-client";
 import { FieldColumn } from "../types";
 import { json } from "stream/consumers";
@@ -434,27 +434,31 @@ function CreateAfterFind(relations: { [key: string]: YaoModel.Relation }) {
       console.log(`模型${element.model}不存在！`);
       continue;
     }
-    let query: YaoQueryParam.QueryParam = {};
+    let query: YaoQuery.QueryDSL = {};
     if (element.query) {
       query = element.query;
     } else {
     }
-    if (!query.table) {
-      query.table = model.table.name;
+    if (!query.from) {
+      query.from = model.table.name;
     }
     // if (!query.limit) {
     //   query.limit = 100;
     // }
     query.wheres = query.wheres || [];
+    if (!query.select) {
+      query.select = [];
+      model.columns.forEach((col) => query.select.push(col.name));
+    }
     query.wheres.push({
       column: element.key,
       op: "=",
-      value: payload.id,
+      value: ">>>payload.id<<<",
     });
-
-    templates.push(`payload[${rel}]= t.Get({
-      query: ${JSON.stringify(query)},
-  });`);
+    let str = `payload["${rel}"]= t.Get(
+      ${JSON.stringify(query)},
+  );`.replace(/">>>payload.id<<<"/g, "payload.id");
+    templates.push(str);
   }
 
   return `

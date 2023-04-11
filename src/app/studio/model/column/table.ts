@@ -302,7 +302,7 @@ export function Cast(
     }
   }
 
-  component = Studio("model.column.file.IsFile", column, component);
+  component = Studio("model.column.file.IsFile", column, component, modelDsl);
 
   //检查是否下拉框显示
   component = Studio("model.relation.Select", column, modelDsl, component);

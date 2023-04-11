@@ -11,8 +11,22 @@ export function ImagesView(data: string): string[] {
   if (!data || !data.length) {
     return [];
   }
+  let isArray = true;
+  try {
+    isArray = Array.isArray(JSON.parse(data));
+  } catch (error) {
+    isArray = false;
+  }
 
-  return data.includes("[") ? JSON.parse(data) : data.split(",");
+  let array: string[] = Array.isArray(data)
+    ? data
+    : isArray
+    ? JSON.parse(data)
+    : data.includes(",")
+    ? data.split(",")
+    : [data];
+
+  return array;
 }
 
 /**

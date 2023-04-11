@@ -14,7 +14,8 @@ import { Studio } from "yao-node-client";
  */
 export function IsFile(
   column: YaoModel.ModelColumn,
-  component: FieldColumn
+  component: FieldColumn,
+  modelDsl: YaoModel.ModelDSL
 ): FieldColumn {
   if (
     !["text", "json", "string", "logngtext", "mediumText"].includes(column.type)
@@ -50,9 +51,12 @@ export function IsFile(
         },
         edit: {
           type: "Upload",
-          compute: "Upload",
-          //compute: "scripts.file.image.ImagesEdit",
+          compute: {
+            process: "scripts.file.image.ImagesEdit",
+            args: ["$C(row)", name, modelDsl.table.name],
+          },
           props: {
+            maxCount: 100, //多个图片
             filetype: "image",
             $api: {
               process: "fs.system.Upload",
@@ -121,6 +125,7 @@ export function IsFormFile(
             args: ["$C(row)", name, modelDsl.table.name],
           },
           props: {
+            maxCount: 100, //多个图片
             filetype: "image",
             $api: { process: "fs.system.Upload" },
           },
