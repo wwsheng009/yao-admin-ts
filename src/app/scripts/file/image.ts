@@ -9,7 +9,7 @@ import { Process } from "yao-node-client";
  */
 export function ImagesView(data: string): string[] {
   if (!data || !data.length) {
-    return [];
+    return null;
   }
   let isArray = true;
   try {
@@ -26,6 +26,9 @@ export function ImagesView(data: string): string[] {
     ? data.split(",")
     : [data];
 
+  if (!array || array.length == 0) {
+    return null;
+  }
   return array;
 }
 

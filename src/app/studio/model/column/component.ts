@@ -193,7 +193,11 @@ export function EditPropes(
   }
 
   // 默认值
-  if (column.default != null) {
+  if (
+    column.default != null &&
+    column.default != "TlVMTA==" &&
+    component.edit.type !== "Upload"
+  ) {
     component.edit.props.itemProps = component.edit.props.itemProps || {};
     const ismysql: boolean = Studio("model.utils.IsMysql");
     const defaultValue =
@@ -204,14 +208,6 @@ export function EditPropes(
         : column.default;
 
     component.edit.props.itemProps.initialValue = defaultValue;
-
-    // if (["RadioGroup", "Select"].includes(component.edit.type)) {
-    //   component.edit.props.value = defaultValue;
-    // }
-
-    // if (component.view && ["Switch"].includes(component.view.type)) {
-    //   component.view.props.value = defaultValue;
-    // }
   }
   return component;
 }
@@ -284,7 +280,10 @@ function GetRules(
     !/^id$/i.test(dbColumnType) &&
     (index ||
       unique ||
-      ((columnDefault === null || columnDefault === undefined) && !nullable))
+      ((columnDefault === null ||
+        columnDefault === undefined ||
+        columnDefault === "TlVMTA==") &&
+        !nullable))
   ) {
     rule.required = true;
   }
