@@ -24,8 +24,8 @@
   "license": "MIT",
   "dependencies": {
     "antd": "^5.4.0",
-    "yao-app-ts-types": "workspace:*",
-    "yao-node-client": "workspace:*",
+    "yao-app-ts-types": "*",
+    "yao-node-client": "*",
     "yao-node-server": "^1.0.0",
     "yargs": "^17.7.1"
   },
