@@ -4,8 +4,8 @@ import { YaoComponent, YaoField, YaoForm } from "yao-app-ts-types";
 export type FieldColumn = YaoField.ColumnDSL & {
   /**是否下拉框 */
   is_select?: boolean;
-  /**是否图片 */
-  is_image?: boolean;
+  /**是否上传 */
+  is_upload?: boolean;
   /**关联表 */
   // withs?: MapAny;
 }; // & MapAny;

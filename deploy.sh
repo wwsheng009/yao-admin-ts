@@ -4,8 +4,6 @@ pnpm run yao:build-fix
 
 source .env
 
-target=/data/projects/yao/demos-v1.0/yao-admin
-
 target="${YAO_APP_ROOT}"
 
 echo "目标目录：${target}"

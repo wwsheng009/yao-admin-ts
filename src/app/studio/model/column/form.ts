@@ -404,11 +404,11 @@ export function Cast(
   );
   component = Studio("model.relation.EditSelect", column, modelDsl, component);
 
-  if (component.is_image) {
+  if (component.is_upload) {
     width = 24;
   }
 
-  delete component.is_image;
+  delete component.is_upload;
   component = Studio("model.column.component.EditPropes", component, column);
   component = updateFormCompModelXgen(component, column, modelDsl);
   if (!component.edit?.props?.ddic_hide) {
