@@ -133,7 +133,7 @@ export function LoadModelFromFile() {
   const files: string[] = Studio("model.model.GetModelFnameList");
   const fs = new FS("dsl");
   const modelDsl = files.map((file) => {
-    return JSON.parse(fs.ReadFile("models/" + file));
+    return JSON.parse(fs.ReadFile(file));
   });
   LoadModel(modelDsl);
 }
