@@ -84,7 +84,7 @@ export function Create(modelDsls: YaoModel.ModelDSL[]) {
       ],
     },
   };
-  Studio("model.file.MoveAndWrite", "/flows/app", "menu.flow.json", dsl);
+  Studio("model.file.MoveAndWrite", "flows/app", "menu.flow.json", dsl);
 }
 
 /**

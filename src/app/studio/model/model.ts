@@ -10,7 +10,7 @@ export function CreateFromFile() {
   const files = GetModelFnameList();
   const fs = new FS("dsl");
   const modelDsls: YaoModel.ModelDSL[] = files.map((file) => {
-    return JSON.parse(fs.ReadFile("models/" + file));
+    return JSON.parse(fs.ReadFile(file));
   });
 
   // 创建表格与表单dsl
@@ -35,7 +35,7 @@ export function CreateMenuFromModels() {
   const files = GetModelFnameList();
   const fs = new FS("dsl");
   const modelDsls = files.map((file) => {
-    return JSON.parse(fs.ReadFile("models/" + file));
+    return JSON.parse(fs.ReadFile(file));
   });
 
   Studio("model.dsl.menu.Create", modelDsls);
@@ -68,9 +68,7 @@ export function GetModelFnameList(): string[] {
   const fs = new FS("dsl");
   const files: string[] = fs.ReadDir("models/", true);
 
-  return files
-    .filter((file) => !fs.IsDir(file) && file.endsWith(".mod.json"))
-    .map((file) => file.replace("/models/", ""));
+  return files.filter((file) => !fs.IsDir(file) && file.endsWith(".mod.json"));
 }
 
 /**
@@ -83,7 +81,7 @@ export function GetModelsFromFile(): YaoModel.ModelDSL[] {
   const files: string[] = GetModelFnameList();
   const fs = new FS("dsl");
   return files.map((file) => {
-    return JSON.parse(fs.ReadFile("models/" + file));
+    return JSON.parse(fs.ReadFile(file));
   });
 }
 
