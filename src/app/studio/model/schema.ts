@@ -81,6 +81,10 @@ export function Relation(): YaoModel.ModelDSL[] {
         case "MEDIUMINT":
           column.type = "tinyInteger";
           break;
+        case "JSON":
+        case "TEXT":
+          delete column.length;
+          break;
         default:
           break;
       }
