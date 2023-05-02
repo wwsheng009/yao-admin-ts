@@ -341,9 +341,6 @@ export function Cast(
         },
         type: "CodeEditor",
       },
-      view: {
-        compute: "scripts.ddic.compute.json.View",
-      },
     };
   } else if (column.type == "enum") {
     component = {
@@ -416,6 +413,7 @@ export function Cast(
 
   delete component.is_upload;
   component = Studio("model.column.component.EditPropes", component, column);
+
   component = updateFormCompModelXgen(component, column, modelDsl);
   if (!component.edit?.props?.ddic_hide) {
     res.layout.push({
@@ -423,7 +421,10 @@ export function Cast(
       width: width,
     });
   }
-
+  if (component.edit?.type === "CodeEditor") {
+    component.view = component.view || {};
+    component.view.compute = "scripts.ddic.compute.json.View";
+  }
   res.fields.push({
     name: title,
     component: component,
