@@ -76,6 +76,8 @@ export function UpdateColumnFromDsl(
   modelCol: YaoModel.ModelColumn
 ): ddic_model_column {
   let col = modelCol as ddic_model_column;
+
+  //save element for column
   if (modelCol.option || modelCol.validations) {
     let element: ddic_model_element = {
       name: model.name + "_" + modelCol.name,
@@ -108,6 +110,7 @@ export function UpdateColumnFromDsl(
       ...element,
     };
     id = Process("models.ddic.model.element.Save", data1);
+
     col.element_id = id;
   }
   return col;
@@ -135,6 +138,15 @@ export function LoadModelFromFile() {
   const modelDsl = files.map((file) => {
     return JSON.parse(fs.ReadFile(file));
   });
+  LoadModel(modelDsl);
+}
+
+export function LoadModelSingleFromFile(model: string) {
+  let table_name: string = Studio("model.file.SlashName", model);
+
+  const file = `models/${table_name}.mod.json`;
+  const fs = new FS("dsl");
+  const modelDsl = [JSON.parse(fs.ReadFile(file))];
   LoadModel(modelDsl);
 }
 

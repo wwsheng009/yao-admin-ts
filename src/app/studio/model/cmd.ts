@@ -15,7 +15,7 @@ export function Setup() {
   // 单独创建列表
   Studio("model.model.CreateList", "ddic.model.relation");
   // 加载ddic定义列表
-  Studio("ddic.loader.LoadModelFromFile");
+  // Studio("ddic.loader.LoadModelFromFile");
 }
 /**
  * 根据数据库表定义创建所有的模型对应的表格与表单
@@ -50,7 +50,7 @@ export function CreateFromFile() {
 /**
  * 创建单个模型对应的Table/Form
  *
- * yao studio run model.model.CreateOne model
+ * yao studio run model.cmd.CreateOne model
  * @param modelName 模型名称
  */
 export function CreateOne(modelName: string) {

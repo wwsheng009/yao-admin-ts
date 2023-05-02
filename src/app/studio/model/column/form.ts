@@ -37,7 +37,7 @@ export function toForm(modelDsl: YaoModel.ModelDSL, type: string = "view") {
       action: [
         {
           name: "StudioModel",
-          type: "Studio.model",
+          type: "Studio.model.cmd",
           payload: { method: "CreateOne", args: [table_dot_name] },
         },
         {

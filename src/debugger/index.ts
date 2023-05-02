@@ -10,17 +10,20 @@ import { CreateFromFile, CreateFromDB } from "@/app/studio/model/cmd";
 // CreateFromFile();
 // CreateMenuFromFile();
 
-import { LoadModelFromFile } from "@/app/studio/ddic/loader";
+import {
+  LoadModelFromFile,
+  LoadModelSingleFromFile,
+} from "@/app/studio/ddic/loader";
 
 import { GenerateModelFile } from "@/app/studio/ddic/generator";
 
 import { CreateMenuFromModels } from "@/app/studio/model/model";
-CreateMenuFromModels();
+// CreateMenuFromModels();
 // GenerateModelFile(14);
 
 // load model data to database
 //yao studio run ddic.loader.LoadModelFromFile
-// LoadModelFromFile();
+LoadModelSingleFromFile("admin.user");
 
 // create ts type from models
 // import { CreateModelTypes } from "@/app/studio/model/ts";

@@ -267,8 +267,7 @@ function GetRules(
   // }
   if (
     !/^id$/i.test(dbColumnType) &&
-    (index ||
-      unique ||
+    (unique ||
       (!nullable &&
         (columnDefault === null ||
           columnDefault === undefined ||
