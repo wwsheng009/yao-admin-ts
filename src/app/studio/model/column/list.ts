@@ -95,12 +95,10 @@ export function Cast(
     //log.Error("castFormColumn: missing name");
     return false;
   }
-
   if (!title) {
     // log.Error("castFormColumn: missing title");
     return false;
   }
-
   // 不展示隐藏列
   const hidden = Studio("model.column.component.HiddenFields", false);
   if (hidden.indexOf(name) != -1) {
@@ -176,6 +174,8 @@ export function Cast(
     component.edit.type = "ColorPicker";
   } else if (column.crypt === "PASSWORD") {
     component.edit.type = "Password";
+    component.view = component.view || {};
+    component.view.compute = "Hide";
   } else {
     if (column.type in types) {
       component.edit.type = types[column.type];

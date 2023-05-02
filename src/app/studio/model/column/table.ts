@@ -294,6 +294,8 @@ export function Cast(
     component.edit.type = "ColorPicker";
     width = 80;
   } else if (column.crypt === "PASSWORD") {
+    component.view = component.view || {};
+    component.view.compute = "Hide";
     component.edit.type = "Password";
     width = 180;
   } else {

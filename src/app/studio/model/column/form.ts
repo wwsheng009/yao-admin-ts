@@ -334,11 +334,15 @@ export function Cast(
     component = {
       bind: bind,
       edit: {
+        // compute: "scripts.ddic.compute.json.Edit",
         props: {
           language: "json",
           height: 200,
         },
         type: "CodeEditor",
+      },
+      view: {
+        compute: "scripts.ddic.compute.json.View",
       },
     };
   } else if (column.type == "enum") {
@@ -387,6 +391,8 @@ export function Cast(
     component.edit.type = "ColorPicker";
   } else if (column.crypt === "PASSWORD") {
     component.edit.type = "Password";
+    component.view = component.view || {};
+    component.view.compute = "Hide";
   } else {
     if (column.type in types) {
       component.edit.type = types[column.type];
