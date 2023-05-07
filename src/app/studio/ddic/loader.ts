@@ -60,13 +60,12 @@ export function UpdateTableFromDsl(
   //关联关系
   if (modelDsl.relations) {
     model.relations = [];
+    let relations: ddic_model_relation[] = [];
+    for (const key in modelDsl.relations) {
+      relations.push(UpdateRelationFromDsl(key, modelDsl.relations[key]));
+    }
+    model.relations = relations;
   }
-
-  let relations: ddic_model_relation[] = [];
-  for (const key in modelDsl.relations) {
-    relations.push(UpdateRelationFromDsl(key, modelDsl.relations[key]));
-  }
-  model.relations = relations;
 
   return model;
 }

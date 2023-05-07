@@ -228,7 +228,7 @@ function updateReference(
   formTemplate: YaoForm.FormDSL,
   modelDsl: YaoModel.ModelDSL
 ) {
-  const hasCount = Object.values(modelDsl.relations).filter(
+  const hasCount = Object.values(modelDsl.relations || { type: "" }).filter(
     (rel) => rel.type === "hasOne"
   ).length;
 
@@ -247,7 +247,7 @@ function updateReference(
   });
 
   const referenceContent: YaoForm.FloatContentItem[] = [];
-  for (const rel in modelDsl.relations) {
+  for (const rel in modelDsl.relations || {}) {
     if (modelDsl.relations[rel].type === "hasOne") {
       referenceContent.push({
         name: modelDsl.relations[rel].label || rel,

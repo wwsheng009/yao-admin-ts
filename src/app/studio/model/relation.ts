@@ -162,7 +162,7 @@ export function Select(
   const name = column.name;
 
   const bind = `${name}`;
-  const relation = modelDsl.relations;
+  const relation = modelDsl.relations || {};
   for (const rel in relation) {
     if (
       relation[rel].type == "hasOne" &&
@@ -230,7 +230,7 @@ export function EditSelect(
   const props = column.props || {};
   const name = column.name;
   const bind = `${name}`;
-  const relation = modelDsl.relations;
+  const relation = modelDsl.relations || {};
 
   for (const rel in relation) {
     if (
@@ -270,7 +270,8 @@ export function EditSelect(
 //  * @param modelDsl
 //  */
 export function GetWiths(modelDsl: YaoModel.ModelDSL) {
-  const relations: { [key: string]: YaoModel.Relation } = modelDsl.relations;
+  const relations: { [key: string]: YaoModel.Relation } =
+    modelDsl.relations || {};
 
   let withs: MapAny = {};
   for (const rel in relations) {
@@ -292,7 +293,7 @@ export function GetWiths(modelDsl: YaoModel.ModelDSL) {
  * 把hasMany变成表单中的Table
  */
 export function Table(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
-  const relations = modelDsl.relations;
+  const relations = modelDsl.relations || {};
   for (const rel in relations) {
     // console.log(`translate.translate:${i}`);
     if (relations[rel].type != "hasMany") {
@@ -339,7 +340,7 @@ interface RelationShip {
  * 把hasMany变成表单中的List
  */
 export function List(formDsl: YaoForm.FormDSL, modelDsl: YaoModel.ModelDSL) {
-  const relations = modelDsl.relations;
+  const relations = modelDsl.relations || {};
 
   let RelList: RelationShip[] = [];
 
