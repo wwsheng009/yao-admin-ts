@@ -440,9 +440,9 @@ function CreateAfterFind(relations: { [key: string]: YaoModel.Relation }) {
       query = element.query;
     } else {
     }
-    if (!query.from) {
-      query.from = model.table.name;
-    }
+    // if (!query.from) {
+    //   query.from = model.table.name;
+    // }
     // if (!query.limit) {
     //   query.limit = 100;
     // }
@@ -452,13 +452,13 @@ function CreateAfterFind(relations: { [key: string]: YaoModel.Relation }) {
       model.columns.forEach((col) => query.select.push(col.name));
     }
     query.wheres.push({
-      field: element.key,
-      op: "=",
+      column: element.key,
+      // op: "=",
       value: ">>>payload.id<<<",
     });
-    let str = `payload["${rel}"]= t.Get(
-      ${JSON.stringify(query)},
-  );`.replace(/">>>payload.id<<<"/g, "payload.id");
+    let str = `payload["${rel}"]=  Process('models.${element.model}.Get', 
+      ${JSON.stringify(query)}
+    );`.replace(/">>>payload.id<<<"/g, "payload.id");
     templates.push(str);
   }
 
